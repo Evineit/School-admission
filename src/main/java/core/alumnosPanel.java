@@ -17,9 +17,11 @@ public class alumnosPanel extends JPanel {
     private JTable table1 = new JTable();
     JTextField searchField = new JTextField();
     Connection con = SqlService.getConnection();
-
     JButton addButton = new JButton("Agregar");
     private MainWindow parentPanel;
+    String[] sortingMode = {
+            "Informacion General"
+    };
 
 
     public alumnosPanel(MainWindow mainWindow) {
@@ -31,7 +33,7 @@ public class alumnosPanel extends JPanel {
         temporal.add(new JButton("Borrar"));
         temporal.add(new JTextField(10));
         temporal.add(new JButton("Buscar"));
-        temporal.add(new JComboBox<String>());
+        temporal.add(new JComboBox<>(sortingMode));
         add(temporal,BorderLayout.NORTH);
         add(new JScrollPane(table1),BorderLayout.CENTER);
         initTabla();
@@ -44,20 +46,22 @@ public class alumnosPanel extends JPanel {
         });
     }
 
-    private void initTabla() {
+    public void initTabla() {
         initTabla("");
     }
     private void initTabla(String id){
         miModelo = new DefaultTableModel();
-        miModelo.addColumn("Id_granjero");
+        miModelo.addColumn("Id Alumno");
         miModelo.addColumn("Nombre");
-        miModelo.addColumn("Teléfono");
-        miModelo.addColumn("Correo");
-        miModelo.addColumn("Facebook");
-        miModelo.addColumn("Cultivo");
+        miModelo.addColumn("Apellido P");
+        miModelo.addColumn("Apellido M");
+        miModelo.addColumn("Edad");
+        miModelo.addColumn("Dirección");
+        miModelo.addColumn("Id Tutor");
+        miModelo.addColumn("Matricula");
         table1.setModel(miModelo);
 
-        String[] datos = new String[6];
+        String[] datos = new String[8];
 
 //        String sql ="Select * from empleado";
         String sql;
@@ -78,6 +82,8 @@ public class alumnosPanel extends JPanel {
                 datos[3]=rs.getString(4);
                 datos[4]=rs.getString(5);
                 datos[5]=rs.getString(6);
+                datos[6]=rs.getString(7);
+                datos[7]=rs.getString(8);
                 miModelo.addRow(datos);
             }
             table1.setModel(miModelo);

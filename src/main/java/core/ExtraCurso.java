@@ -5,11 +5,11 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-
+//todo primaria
 public class ExtraCurso extends JPanel {
-    String data[] = {"Ajedrez","Futbol"};
+    String extraCurs[] = {"Ajedrez","Futbol"};
+    String talleres[] = {"Electricidad","Carpintería"};
     JButton nextButton = new JButton("Siguiente");
     JButton cancelButton = new JButton("Cancelar");
     private Connection connection = SqlService.getConnection();
@@ -19,11 +19,20 @@ public class ExtraCurso extends JPanel {
     private int admissionId;
 
 
-    public ExtraCurso(MainWindow mainWindow) {
+    public ExtraCurso(MainWindow mainWindow, int id, int grade) {
+        setStudentId(id);
+        setStudentGrade(grade);
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        add(new JLabel("Extracurricular"));
-        list = new JList<>(data);
+
+        if (grade>=10){
+            add(new JLabel("Selección de extracurricular"));
+            list = new JList<>(extraCurs);
+        }else {
+            add(new JLabel("Selección de talleres"));
+            list = new JList<>(extraCurs);
+        }
         add(new JScrollPane(list));
+
         add(nextButton);
         add(cancelButton);
         nextButton.addMouseListener(new MouseAdapter() {
@@ -35,11 +44,22 @@ public class ExtraCurso extends JPanel {
         });
     }
 
+    public ExtraCurso() {
+
+    }
+
+
     private void insertInscripcion() {
         try {
-
-            PreparedStatement insertInsc = connection.prepareStatement("Insert Into inscripciones (ID_ALUMNO, GRADO, EXTRACLASE, INSC_FECHA)"+
-                    "values (?,?,?,now())");
+            String query;
+            if (studentGrade>=10){
+                query = "Insert Into inscripciones (ID_ALUMNO, GRADO, EXTRACLASE, INSC_FECHA)" +
+                        "values (?,?,?,now())";
+            }else {
+                query = "Insert Into inscripciones (ID_ALUMNO, GRADO, TALLER, INSC_FECHA)" +
+                        "values (?,?,?,now())";
+            }
+            PreparedStatement insertInsc = connection.prepareStatement(query);
             insertInsc.setInt(1, studentId);
             insertInsc.setInt(2, studentGrade);
             insertInsc.setString(3,list.getSelectedValue());

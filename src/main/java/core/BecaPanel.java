@@ -11,6 +11,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -55,19 +56,43 @@ public class BecaPanel extends JPanel {
             @Override
             public void mouseClicked(MouseEvent e) {
                 //Todo assert not empty
+                //todo register scholarship based on fields
                 if (!cost.equals(totalAmount)){
-                    int idSShip = SqlService.registerScholarship();
+                    try {
+                        int idSShip = SqlService.registerScholarship(idAdmission,idStudent, Integer.parseInt(percent.getText()),Double.parseDouble(flatAmount.getText()));
+                        mainWindow.changePayment(idAdmission,idSShip);
+                    } catch (SQLException throwables) {
+                        throwables.printStackTrace();
+                        //Todo error rollback
+                    }
+                }else {
+                    mainWindow.changePayment(idAdmission);
                 }
-                mainWindow.changePayment(idAdmission);
             }
         });
+        addChangeListener(percent,e -> calculateDiscount());
+        addChangeListener(flatAmount,e -> calculateDiscount());
 
+
+    }
+    private void calculateDiscount(){
+        // TODO: 03/06/2020 assert flatdiscount and percent are non negative, percent is between 0,100
+        // TODO: 03/06/2020 double and format on discount and total amount
+        // TODO: 03/06/2020 beca checkbox
+        double cost = Double.parseDouble(this.cost.getText());
+        double flatDiscount = Double.parseDouble(flatAmount.getText());
+        double percent = Double.parseDouble(this.percent.getText());
+        double d = (cost - flatDiscount);
+        d -= d * (percent / 100);
+        discount.setText(String.valueOf(cost - d));
+        totalAmount.setText(String.valueOf(d));
     }
     private void disableComponents(){
         name.setEnabled(false);
         lName1.setEnabled(false);
         lName2.setEnabled(false);
         level.setEnabled(false);
+        cost.setEnabled(false);
         gradeField.setEnabled(false);
         discount.setEnabled(false);
         totalAmount.setEnabled(false);
@@ -90,11 +115,11 @@ public class BecaPanel extends JPanel {
             }
         }else if (grade<=9){
             level.setText(levels[1]);
-            cost.setText(String.valueOf(prices[3]));
+            cost.setText(String.valueOf(prices[2]));
 
         }else {
             level.setText(levels[2]);
-            cost.setText(String.valueOf(prices[4]));
+            cost.setText(String.valueOf(prices[3]));
         }
         percent.setText("0");
         flatAmount.setText("0");

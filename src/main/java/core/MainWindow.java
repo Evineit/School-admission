@@ -26,7 +26,7 @@ public class MainWindow extends JFrame {
     //todo Valida todo GRACIAS
     public MainWindow() {
         alumnos = new alumnosPanel(this);
-        extraPanel = new ExtraCurso(this);
+        extraPanel = new ExtraCurso();
         becaPanel = new BecaPanel();
         payPanel = new PaymentPanel();
 
@@ -106,9 +106,13 @@ public class MainWindow extends JFrame {
         cl.show(contentPanel, "Card2");
 //        leftPanel.changeFocus(0);
     }
+    public void changeAlumnos(){
+        alumnos.initTabla();
+        cl.show(contentPanel, "Card1");
+    }
     public void changeExtra(int id, int grade){
-        extraPanel.setStudentId(id);
-        extraPanel.setStudentGrade(grade);
+        extraPanel = new ExtraCurso(this,id,grade);
+        contentPanel.add(extraPanel,"Card3");
         cl.show(contentPanel, "Card3");
     }
     public void changeBeca(int idStudent, int idInscrip){
@@ -120,7 +124,12 @@ public class MainWindow extends JFrame {
     public void changePayment(int idAdmission) {
         payPanel = new PaymentPanel(this,idAdmission);
         contentPanel.add(payPanel,"Card5");
+        cl.show(contentPanel, "Card5");
+    }
 
+    public void changePayment(int idAdmission, int idSShip) {
+        payPanel = new PaymentPanel(this,idAdmission,idSShip);
+        contentPanel.add(payPanel,"Card5");
         cl.show(contentPanel, "Card5");
     }
 }

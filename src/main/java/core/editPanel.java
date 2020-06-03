@@ -44,8 +44,14 @@ public class editPanel extends JPanel {
             @Override
             public void mouseClicked(MouseEvent e) {
                 try {
-                    int id = addStudent();
-                    mainWindow.changeExtra(id,grade.getSelectedIndex()+1);
+                    int studentID = addStudent();
+                    final int grade = editPanel.this.grade.getSelectedIndex() + 1;
+                    if (grade<=6){
+                        int inscID = SqlService.insertInscription(studentID,grade);
+                        mainWindow.changeBeca(studentID,inscID);
+                    }else {
+                        mainWindow.changeExtra(studentID, grade);
+                    }
                 } catch (SQLException throwables) {
                     throwables.printStackTrace();
                 }
@@ -55,6 +61,7 @@ public class editPanel extends JPanel {
             @Override
             public void mouseClicked(MouseEvent e) {
                 try {
+                    mainWindow.changeAlumnos();
                     connection.rollback();
                 } catch (SQLException throwables) {
                     throwables.printStackTrace();
@@ -72,6 +79,7 @@ public class editPanel extends JPanel {
         grade = new JComboBox<>(grades);
         tutorName = new JTextField();
         tutorLName = new JTextField();
+        //TODO Validate Phone
         tutorPhone = new JTextField();
         tutorRfc = new JTextField();
 
@@ -93,6 +101,7 @@ public class editPanel extends JPanel {
     }
 
     private void addTutor() throws SQLException {
+        // TODO: 03/06/2020 check for existing parent / reuse parents
         PreparedStatement preparedStatement = connection.prepareStatement("Insert into tutores (TUTO_NOMBRE, TUTO_APELLIDO, TUTO_RFC, TUTO_TELEFONO)" +
                 "values (?,?,?,?)");
         preparedStatement.setString(1, tutorName.getText());
@@ -103,7 +112,7 @@ public class editPanel extends JPanel {
 
 
     }
-
+    //TODO assert fields not empty
     public int addStudent() throws SQLException {
         int idStudent=0;
         try {

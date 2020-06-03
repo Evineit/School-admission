@@ -93,18 +93,47 @@ public class SqlService {
         }
         return null;
     }
-    public static int registerScholarship(){
-        return 0;
+    public static ArrayList<String> getScholarship(int id) {
+        ArrayList<String> list = new ArrayList<>();
+        final String query = "SELECT * FROM becas WHERE ID_BECA = ?";
+        try (PreparedStatement pStatement = connection.prepareStatement(query)) {
+            pStatement.setInt(1, id);
+            ResultSet resultSet = pStatement.executeQuery();
+            while (resultSet.next()) {
+                list.add(resultSet.getString(1));
+                list.add(resultSet.getString(2));
+                list.add(resultSet.getString(3));
+                list.add(resultSet.getString(4));
+                list.add(resultSet.getString(5));
+            }
+            return list;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static int registerScholarship(int admissionId, int studentId,int percent, double flat) throws SQLException {
+        int idScholarship;
+        PreparedStatement insertStudent = connection.prepareStatement("insert into becas (ID_ALUMNO, ID_INSCRIPCION, PORCENTAJE, CANTIDAD) " +
+                "values (?,?,?,?)");
+        insertStudent.setInt(1, studentId);
+        insertStudent.setInt(2, admissionId);
+        insertStudent.setInt(3, percent);
+        insertStudent.setBigDecimal(4, BigDecimal.valueOf(flat));
+        insertStudent.executeUpdate();
+        idScholarship = SqlService.getLastID();
+        return idScholarship;
     }
 
     public static void registerPayment(int admissionId, int studentId, double amount,String details) throws SQLException {
-        PreparedStatement insertStudent = connection.prepareStatement("insert into pagos_incripciones (ID_INSCRIPCION, ID_ALUMNO, CANTIDAD_PAGO, OTROS_DETALLES) " +
+        PreparedStatement insertPayment = connection.prepareStatement("insert into pagos_incripciones (ID_INSCRIPCION, ID_ALUMNO, CANTIDAD_PAGO, OTROS_DETALLES) " +
                 "values (?,?,?,?)");
-        insertStudent.setInt(1, admissionId);
-        insertStudent.setInt(2, studentId);
-        insertStudent.setBigDecimal(3, BigDecimal.valueOf(amount));
-        insertStudent.setString(4, details);
-        insertStudent.executeUpdate();
+        insertPayment.setInt(1, admissionId);
+        insertPayment.setInt(2, studentId);
+        insertPayment.setBigDecimal(3, BigDecimal.valueOf(amount));
+        insertPayment.setString(4, details);
+        insertPayment.executeUpdate();
         connection.commit();
         connection.setAutoCommit(true);
 
@@ -121,5 +150,22 @@ public class SqlService {
             throwables.printStackTrace();
         }
         return reto;
+    }
+    public static int insertInscription(int studentId, int studentGrade) {
+        int admissionId = 0;
+        try {
+            String query;
+            query = "Insert Into inscripciones (ID_ALUMNO, GRADO, INSC_FECHA) " +
+                    "values (?,?,now())";
+
+            PreparedStatement insertInsc = connection.prepareStatement(query);
+            insertInsc.setInt(1, studentId);
+            insertInsc.setInt(2, studentGrade);
+            insertInsc.executeUpdate();
+            admissionId = SqlService.getLastID();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return admissionId;
     }
 }

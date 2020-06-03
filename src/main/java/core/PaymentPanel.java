@@ -35,9 +35,9 @@ public class PaymentPanel extends JPanel {
             2500,
             3000
     };
+
     public PaymentPanel(MainWindow mainWindow, int idAdmission) {
         setAdmissionId(idAdmission);
-
         initElements();
         setContents();
         disableComponents();
@@ -47,6 +47,8 @@ public class PaymentPanel extends JPanel {
                 //Todo confirm
                 try {
                     SqlService.registerPayment(admissionId,studentId, Double.parseDouble(totalAmount.getText()),details.getText());
+                    // TODO: 03/06/2020 Doesnt update table
+                    mainWindow.changeAlumnos();
                 } catch (SQLException throwables) {
                     throwables.printStackTrace();
                     try {
@@ -63,6 +65,25 @@ public class PaymentPanel extends JPanel {
 
     public PaymentPanel() {
 
+    }
+
+    public PaymentPanel(MainWindow mainWindow, int idAdmission, int idSShip) {
+        this(mainWindow,idAdmission);
+        calculateDiscount(idSShip);
+    }
+    private void calculateDiscount(int idSShip){
+        ArrayList<String> scholarShip = SqlService.getScholarship(idSShip);
+        // TODO: 03/06/2020 assert flatDiscount and percent are non negative, percent is between 0,100
+        int cost = Integer.parseInt(this.cost.getText());
+        double flatDiscount = Double.parseDouble(scholarShip.get(4));
+        double percent = Double.parseDouble(scholarShip.get(3));
+        double d = (cost - flatDiscount);
+        d -= d * (percent / 100);
+        this.percent.setText(scholarShip.get((3)));
+        this.flatAmount.setText(scholarShip.get(4));
+
+        this.discount.setText(String.valueOf(cost - d));
+        this.totalAmount.setText(String.valueOf(d));
     }
 
     private void disableComponents(){
@@ -98,11 +119,11 @@ public class PaymentPanel extends JPanel {
             }
         }else if (grade<=9){
             level.setText(levels[1]);
-            cost.setText(String.valueOf(prices[3]));
+            cost.setText(String.valueOf(prices[2]));
 
         }else {
             level.setText(levels[2]);
-            cost.setText(String.valueOf(prices[4]));
+            cost.setText(String.valueOf(prices[3]));
         }
         //Todo get beca por id
         percent.setText("0");
@@ -124,6 +145,7 @@ public class PaymentPanel extends JPanel {
         flatAmount = new JTextField();
         discount = new JTextField();
         details = new JTextArea();
+        details.setLineWrap(true);
         totalAmount = new JTextField();
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
