@@ -13,6 +13,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class alumnosPanel extends JPanel {
+    private final JButton editButton = new JButton("Editar");
+    private final JButton deleteButton = new JButton("Borrar");
     DefaultTableModel miModelo;
     private JTable table1 = new JTable();
     JTextField searchField = new JTextField();
@@ -22,6 +24,7 @@ public class alumnosPanel extends JPanel {
     String[] sortingMode = {
             "Informacion General"
     };
+    private final JComboBox<String> comboBox = new JComboBox<>(sortingMode);
 
 
     public alumnosPanel(MainWindow mainWindow) {
@@ -29,13 +32,13 @@ public class alumnosPanel extends JPanel {
         setLayout(new BorderLayout());
         JPanel temporal = new JPanel();
         temporal.add(addButton);
-        temporal.add(new JButton("Editar"));
-        temporal.add(new JButton("Borrar"));
+        temporal.add(editButton);
+        temporal.add(deleteButton);
         temporal.add(new JTextField(10));
         temporal.add(new JButton("Buscar"));
-        temporal.add(new JComboBox<>(sortingMode));
-        add(temporal,BorderLayout.NORTH);
-        add(new JScrollPane(table1),BorderLayout.CENTER);
+        temporal.add(comboBox);
+        add(temporal, BorderLayout.NORTH);
+        add(new JScrollPane(table1), BorderLayout.CENTER);
         initTabla();
 
         addButton.addMouseListener(new MouseAdapter() {
@@ -44,12 +47,20 @@ public class alumnosPanel extends JPanel {
                 parentPanel.addAlumno();
             }
         });
+        editButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                modifyStudent();
+            }
+        });
+        
     }
 
     public void initTabla() {
         initTabla("");
     }
-    private void initTabla(String id){
+
+    private void initTabla(String id) {
         miModelo = new DefaultTableModel();
         miModelo.addColumn("Id Alumno");
         miModelo.addColumn("Nombre");
@@ -65,37 +76,46 @@ public class alumnosPanel extends JPanel {
 
 //        String sql ="Select * from empleado";
         String sql;
-        if (id.equals("")){
-            sql ="Select * from alumnos";
+        if (id.equals("")) {
+            sql = "Select * from alumnos";
             sortTable();
-        }else{
+        } else {
             sql = "Select * from alumnos where ID_ALUMNO = '" + id + "'";
         }
 
-        try{
-            Statement sentencia= con.createStatement();
+        try {
+            Statement sentencia = con.createStatement();
             ResultSet rs = sentencia.executeQuery(sql);
-            while(rs.next()){
-                datos[0]=rs.getString(1);
-                datos[1]=rs.getString(2);
-                datos[2]=rs.getString(3);
-                datos[3]=rs.getString(4);
-                datos[4]=rs.getString(5);
-                datos[5]=rs.getString(6);
-                datos[6]=rs.getString(7);
-                datos[7]=rs.getString(8);
+            while (rs.next()) {
+                datos[0] = rs.getString(1);
+                datos[1] = rs.getString(2);
+                datos[2] = rs.getString(3);
+                datos[3] = rs.getString(4);
+                datos[4] = rs.getString(5);
+                datos[5] = rs.getString(6);
+                datos[6] = rs.getString(7);
+                datos[7] = rs.getString(8);
                 miModelo.addRow(datos);
             }
             table1.setModel(miModelo);
-        }catch(SQLException e ){
+        } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
     private void sortTable() {
         TableRowSorter<TableModel> sorter = new TableRowSorter<>(table1.getModel());
-        sorter.setRowFilter(RowFilter.regexFilter("(?i)"+searchField.getText()));
+        sorter.setRowFilter(RowFilter.regexFilter("(?i)" + searchField.getText()));
         table1.setRowSorter(sorter);
+    }
+    private void modifyStudent() {
+        int row;
+        row=table1.getSelectedRow();
+        if (row==-1 || comboBox.getSelectedIndex()!=0){
+            JOptionPane.showMessageDialog(null, "No hay estudiante seleccionado");
+        }else{
+            parentPanel.editAlumno(Integer.parseInt((String) table1.getValueAt(row,0)));
+        }
     }
 
 }

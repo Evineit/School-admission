@@ -44,23 +44,33 @@ public class PaymentPanel extends JPanel {
         nextButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                //Todo confirm
-                try {
-                    SqlService.registerPayment(admissionId,studentId, Double.parseDouble(totalAmount.getText()),details.getText());
-                    // TODO: 03/06/2020 Doesnt update table
-                    mainWindow.changeAlumnos();
-                } catch (SQLException throwables) {
-                    throwables.printStackTrace();
-                    try {
-                        SqlService.getConnection().rollback();
-                    } catch (SQLException sqlException) {
-                        sqlException.printStackTrace();
-                    }
+                nextLogic(mainWindow);
+            }
+        });
+        cancelButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int i = JOptionPane.showConfirmDialog(null,"¿Esta seguro de que desea cancelar el proceso de inscripción?",
+                        "Cancelar inscripción",JOptionPane.YES_NO_OPTION);
+                if (i == JOptionPane.YES_OPTION){
+                    mainWindow.rollback();
                 }
             }
         });
 
 
+    }
+
+    public void nextLogic(MainWindow mainWindow) {
+        //Todo confirm
+        try {
+            SqlService.registerPayment(admissionId,studentId, Double.parseDouble(totalAmount.getText()),details.getText());
+            // TODO: 03/06/2020 Doesnt update table
+            mainWindow.changeAlumnos();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+            mainWindow.rollback();
+        }
     }
 
     public PaymentPanel() {
@@ -71,6 +81,8 @@ public class PaymentPanel extends JPanel {
         this(mainWindow,idAdmission);
         calculateDiscount(idSShip);
     }
+
+
     private void calculateDiscount(int idSShip){
         ArrayList<String> scholarShip = SqlService.getScholarship(idSShip);
         // TODO: 03/06/2020 assert flatDiscount and percent are non negative, percent is between 0,100

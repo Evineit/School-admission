@@ -42,12 +42,13 @@ public class BecaPanel extends JPanel {
             2500,
             3000
     };
+    private int idBeca;
 
     public BecaPanel() {
     }
 
     public BecaPanel(MainWindow mainWindow, int idStudent, int idInscrip) {
-        this.idStudent =idStudent;
+        this.idStudent = idStudent;
         this.idAdmission = idInscrip;
         initElements();
         setContents();
@@ -57,25 +58,72 @@ public class BecaPanel extends JPanel {
             public void mouseClicked(MouseEvent e) {
                 //Todo assert not empty
                 //todo register scholarship based on fields
-                if (!cost.equals(totalAmount)){
+                if (!cost.equals(totalAmount)) {
                     try {
-                        int idSShip = SqlService.registerScholarship(idAdmission,idStudent, Integer.parseInt(percent.getText()),Double.parseDouble(flatAmount.getText()));
-                        mainWindow.changePayment(idAdmission,idSShip);
+                        int idSShip = SqlService.registerScholarship(idAdmission, idStudent, Integer.parseInt(percent.getText()), Double.parseDouble(flatAmount.getText()));
+                        mainWindow.changePayment(idAdmission, idSShip);
                     } catch (SQLException throwables) {
                         throwables.printStackTrace();
                         //Todo error rollback
+                        mainWindow.rollback();
                     }
-                }else {
+                } else {
                     mainWindow.changePayment(idAdmission);
                 }
             }
         });
-        addChangeListener(percent,e -> calculateDiscount());
-        addChangeListener(flatAmount,e -> calculateDiscount());
+        cancelButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int i = JOptionPane.showConfirmDialog(null, "¿Esta seguro de que desea cancelar el proceso de inscripción?",
+                        "Cancelar inscripción", JOptionPane.YES_NO_OPTION);
+                if (i == JOptionPane.YES_OPTION) {
+                    mainWindow.rollback();
+                }
+            }
+        });
+        addChangeListener(percent, e -> calculateDiscount());
+        addChangeListener(flatAmount, e -> calculateDiscount());
 
 
     }
-    private void calculateDiscount(){
+
+    public BecaPanel(MainWindow mainWindow, int idBeca) {
+        this.idBeca = idBeca;
+        ArrayList<String> list = SqlService.getScholarship(idBeca);
+        idStudent = Integer.parseInt(list.get(1));
+        idAdmission = Integer.parseInt(list.get(2));
+        initElements();
+        setContents();
+        disableComponents();
+        percent.setText(list.get(3));
+        flatAmount.setText(list.get(4));
+        percent.setEnabled(false);
+        flatAmount.setEnabled(false);
+        bestow.setEnabled(false);
+        calculateDiscount();
+
+        nextButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                //Todo assert not empty
+                //todo register scholarship based on fields
+                mainWindow.showPayment(idAdmission,idBeca);
+            }
+        });
+        cancelButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int i = JOptionPane.showConfirmDialog(null, "¿Esta seguro de que desea cancelar el proceso de inscripción?",
+                        "Cancelar inscripción", JOptionPane.YES_NO_OPTION);
+                if (i == JOptionPane.YES_OPTION) {
+                    mainWindow.rollback();
+                }
+            }
+        });
+    }
+
+    private void calculateDiscount() {
         // TODO: 03/06/2020 assert flatdiscount and percent are non negative, percent is between 0,100
         // TODO: 03/06/2020 double and format on discount and total amount
         // TODO: 03/06/2020 beca checkbox
@@ -87,7 +135,8 @@ public class BecaPanel extends JPanel {
         discount.setText(String.valueOf(cost - d));
         totalAmount.setText(String.valueOf(d));
     }
-    private void disableComponents(){
+
+    private void disableComponents() {
         name.setEnabled(false);
         lName1.setEnabled(false);
         lName2.setEnabled(false);
@@ -106,18 +155,18 @@ public class BecaPanel extends JPanel {
         lName1.setText(studentList.get(7));
         lName2.setText(studentList.get(5));
         gradeField.setText(String.valueOf(grade));
-        if (grade<=6){
+        if (grade <= 6) {
             level.setText(levels[0]);
-            if (grade<=3){
+            if (grade <= 3) {
                 cost.setText(String.valueOf(prices[0]));
-            }else {
+            } else {
                 cost.setText(String.valueOf(prices[1]));
             }
-        }else if (grade<=9){
+        } else if (grade <= 9) {
             level.setText(levels[1]);
             cost.setText(String.valueOf(prices[2]));
 
-        }else {
+        } else {
             level.setText(levels[2]);
             cost.setText(String.valueOf(prices[3]));
         }
@@ -168,6 +217,7 @@ public class BecaPanel extends JPanel {
     public void setIdStudent(int idStudent) {
         this.idStudent = idStudent;
     }
+
     /**
      * Installs a listener to receive notification when the text of any
      * {@code JTextComponent} is changed. Internally, it installs a
@@ -175,11 +225,11 @@ public class BecaPanel extends JPanel {
      * and a {@link PropertyChangeListener} on the text component to detect
      * if the {@code Document} itself is replaced.
      *
-     * @param text any text component, such as a {@link JTextField}
-     *        or {@link JTextArea}
+     * @param text           any text component, such as a {@link JTextField}
+     *                       or {@link JTextArea}
      * @param changeListener a listener to receieve {@link ChangeEvent}s
-     *        when the text is changed; the source object for the events
-     *        will be the text component
+     *                       when the text is changed; the source object for the events
+     *                       will be the text component
      * @throws NullPointerException if either parameter is null
      */
     public static void addChangeListener(JTextComponent text, ChangeListener changeListener) {
@@ -210,8 +260,8 @@ public class BecaPanel extends JPanel {
             }
         };
         text.addPropertyChangeListener("document", (PropertyChangeEvent e) -> {
-            Document d1 = (Document)e.getOldValue();
-            Document d2 = (Document)e.getNewValue();
+            Document d1 = (Document) e.getOldValue();
+            Document d2 = (Document) e.getNewValue();
             if (d1 != null) d1.removeDocumentListener(dl);
             if (d2 != null) d2.addDocumentListener(dl);
             dl.changedUpdate(null);

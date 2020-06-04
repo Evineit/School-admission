@@ -6,6 +6,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.sql.SQLException;
 
 
 public class MainWindow extends JFrame {
@@ -13,7 +14,7 @@ public class MainWindow extends JFrame {
     private ContentPanel contentPanel;
     private alumnosPanel alumnos;
     private BecaPanel becaPanel;
-    private editPanel editAlumno = new editPanel(this);
+    private editPanel editAlumno;
     private CardLayout cl;
     private LeftPanel leftPanel;
     private GridBagConstraints leftLimit;
@@ -29,6 +30,7 @@ public class MainWindow extends JFrame {
         extraPanel = new ExtraCurso();
         becaPanel = new BecaPanel();
         payPanel = new PaymentPanel();
+        editAlumno = new editPanel();
 
         iniciarUI();
     }
@@ -98,13 +100,19 @@ public class MainWindow extends JFrame {
 //        } catch (Throwable ignoreAndContinue) {
 //        }
         leftPanel.changeFocus(0);
-
+//        setExtendedState(MAXIMIZED_BOTH);
         setLocationRelativeTo(null);
         setVisible(true);
     }
     public void addAlumno(){
+        editAlumno = new editPanel(this);
+        contentPanel.add(editAlumno,"Card2");
         cl.show(contentPanel, "Card2");
-//        leftPanel.changeFocus(0);
+    }
+    public void editAlumno(int idStudent) {
+        editAlumno = new editPanel(this,idStudent);
+        contentPanel.add(editAlumno,"Card2");
+        cl.show(contentPanel, "Card2");
     }
     public void changeAlumnos(){
         alumnos.initTabla();
@@ -115,21 +123,69 @@ public class MainWindow extends JFrame {
         contentPanel.add(extraPanel,"Card3");
         cl.show(contentPanel, "Card3");
     }
+
+    public void changeExtra(int idAdmission) {
+        extraPanel = new ExtraCurso(this,idAdmission);
+        contentPanel.add(extraPanel,"Card3");
+        cl.show(contentPanel, "Card3");
+    }
+
     public void changeBeca(int idStudent, int idInscrip){
         becaPanel = new BecaPanel(this,idStudent,idInscrip);
         contentPanel.add(becaPanel,"Card4");
         cl.show(contentPanel, "Card4");
     }
 
+    public void changeBeca(int idBeca) {
+        becaPanel = new BecaPanel(this,idBeca);
+        contentPanel.add(becaPanel,"Card4");
+        cl.show(contentPanel, "Card4");
+    }
+
+
     public void changePayment(int idAdmission) {
         payPanel = new PaymentPanel(this,idAdmission);
         contentPanel.add(payPanel,"Card5");
         cl.show(contentPanel, "Card5");
     }
+    public void showPayment(int idAdmission) {
+        payPanel = new PaymentPanel(this,idAdmission){
+            @Override
+            public void nextLogic(MainWindow mainWindow) {
+                    // TODO: 03/06/2020 Doesnt update table
+                    mainWindow.changeAlumnos();
+            }
+        };
+        contentPanel.add(payPanel,"Card5");
+        cl.show(contentPanel, "Card5");
+    }
+
+    public void showPayment(int idAdmission, int idBeca) {
+        payPanel = new PaymentPanel(this,idAdmission,idBeca){
+            @Override
+            public void nextLogic(MainWindow mainWindow) {
+                mainWindow.changeAlumnos();
+            }
+        };
+        contentPanel.add(payPanel,"Card5");
+        cl.show(contentPanel, "Card5");
+    }
+
 
     public void changePayment(int idAdmission, int idSShip) {
         payPanel = new PaymentPanel(this,idAdmission,idSShip);
         contentPanel.add(payPanel,"Card5");
         cl.show(contentPanel, "Card5");
+    }
+
+    public void rollback() {
+        try {
+            SqlService.getConnection().rollback();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        finally {
+            changeAlumnos();
+        }
     }
 }

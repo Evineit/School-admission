@@ -41,9 +41,28 @@ public class SqlService {
         return connection;
     }
 
-    public static void startTransaction() throws SQLException {
+    public static void startTransaction() {
         if (connection != null) {
-            connection.createStatement().executeQuery("START TRANSACTION ");
+            try {
+                connection.createStatement().executeQuery("START TRANSACTION ");
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
+        }
+    }
+    public static void updateStudent(int idStudent,String name,String ap1,String ap2,int age,String dir){
+        final String query = "update alumnos set ALUM_NOMBRE=?,ALUM_APELLIDO_P=?," +
+                "ALUM_APELLIDO_M=?,ALUM_EDAD=?,ALUM_DIRECCION=? WHERE ID_ALUMNO = ?";
+        try (PreparedStatement pStatement = connection.prepareStatement(query)) {
+            pStatement.setString(1, name );
+            pStatement.setString(2, ap1);
+            pStatement.setString(3, ap2);
+            pStatement.setInt(4, age);
+            pStatement.setString(5, dir);
+            pStatement.setInt(6, idStudent);
+            int i = pStatement.executeUpdate();
+        }catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 
@@ -62,6 +81,41 @@ public class SqlService {
                 list.add(resultSet.getString(6));
                 list.add(resultSet.getString(7));
                 list.add(resultSet.getString(8));
+            }
+            return list;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+    public static int getIdAdmission(int idStudent){
+        final String query = "SELECT * FROM inscripciones WHERE ID_ALUMNO = ?";
+        try (PreparedStatement pStatement = connection.prepareStatement(query)) {
+            pStatement.setInt(1, idStudent);
+            ResultSet resultSet = pStatement.executeQuery();
+            int idInsc = 0;
+            while (resultSet.next()) {
+                idInsc = resultSet.getInt(1);
+            }
+            return idInsc;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
+    public static ArrayList<String> getPayment(int idInscription){
+        ArrayList<String> list = new ArrayList<>();
+        final String query = "SELECT * FROM pagos_incripciones WHERE ID_INSCRIPCION = ?";
+        try (PreparedStatement pStatement = connection.prepareStatement(query)) {
+            pStatement.setInt(1, idInscription);
+            ResultSet resultSet = pStatement.executeQuery();
+            while (resultSet.next()) {
+                list.add(resultSet.getString(1));
+                list.add(resultSet.getString(2));
+                list.add(resultSet.getString(3));
+                list.add(resultSet.getString(4));
+                list.add(resultSet.getString(5));
+
             }
             return list;
         } catch (SQLException e) {
@@ -96,6 +150,39 @@ public class SqlService {
     public static ArrayList<String> getScholarship(int id) {
         ArrayList<String> list = new ArrayList<>();
         final String query = "SELECT * FROM becas WHERE ID_BECA = ?";
+        return getStrings(list, id, query);
+    }
+    public static int getSSByStudent(int idStudent) {
+        ArrayList<String> list = new ArrayList<>();
+        final String query = "SELECT * FROM becas WHERE ID_ALUMNO = ?";
+        list = getStrings(list, idStudent, query);
+        if (list==null){
+            return -1;
+        }else {
+            return Integer.parseInt(list.get(0));
+        }
+    }
+    public static int getGrade(int studentID) {
+        final String query = "SELECT * FROM inscripciones WHERE ID_ALUMNO = ?";
+        int grade = 0;
+        try (PreparedStatement pStatement = connection.prepareStatement(query)) {
+            pStatement.setInt(1, studentID);
+            ResultSet resultSet = pStatement.executeQuery();
+            while (resultSet.next()) {
+                grade = Integer.parseInt(resultSet.getString(3));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return grade;
+    }
+    public static ArrayList<String> getTutor(int id){
+        ArrayList<String> list = new ArrayList<>();
+        final String query = "SELECT * FROM tutores WHERE ID_TUTOR = ?";
+        return getStrings(list, id, query);
+    }
+
+    private static ArrayList<String> getStrings(ArrayList<String> list, int id, String query) {
         try (PreparedStatement pStatement = connection.prepareStatement(query)) {
             pStatement.setInt(1, id);
             ResultSet resultSet = pStatement.executeQuery();
@@ -167,5 +254,21 @@ public class SqlService {
             throwables.printStackTrace();
         }
         return admissionId;
+    }
+
+    public static void updateTutor(int idTutor, String text, String text1, String text2, String text3) {
+        final String query = "update tutores set TUTO_NOMBRE=?,TUTO_APELLIDO=?," +
+                "TUTO_RFC=?,TUTO_TELEFONO=? WHERE ID_TUTOR = ?";
+        try (PreparedStatement pStatement = connection.prepareStatement(query)) {
+            pStatement.setString(1, text );
+            pStatement.setString(2, text1);
+            pStatement.setString(3, text2);
+            pStatement.setString(4, text3);
+            pStatement.setInt(5, idTutor);
+            int i = pStatement.executeUpdate();
+        }catch (SQLException e) {
+            e.printStackTrace();
+        }
+
     }
 }
