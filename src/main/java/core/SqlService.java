@@ -8,6 +8,7 @@ package core;
 import java.math.BigDecimal;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Objects;
 
 /**
  * @author kevin
@@ -66,11 +67,11 @@ public class SqlService {
         }
     }
 
-    public static ArrayList<String> getAlumno(int id) {
+    public static ArrayList<String> getStudent(int idStudent) {
         ArrayList<String> list = new ArrayList<>();
         final String query = "SELECT * FROM alumnos WHERE ID_ALUMNO = ?";
         try (PreparedStatement pStatement = connection.prepareStatement(query)) {
-            pStatement.setInt(1, id);
+            pStatement.setInt(1, idStudent);
             ResultSet resultSet = pStatement.executeQuery();
             while (resultSet.next()) {
                 list.add(resultSet.getString(1));
@@ -147,10 +148,10 @@ public class SqlService {
         }
         return null;
     }
-    public static ArrayList<String> getScholarship(int id) {
+    public static ArrayList<String> getScholarship(int idScholarship) {
         ArrayList<String> list = new ArrayList<>();
         final String query = "SELECT * FROM becas WHERE ID_BECA = ?";
-        return getStrings(list, id, query);
+        return getStrings(list, idScholarship, query);
     }
     public static int getSSByStudent(int idStudent) {
         ArrayList<String> list = new ArrayList<>();
@@ -286,6 +287,73 @@ public class SqlService {
             pStatement.setInt(2, idAdmission);
             int i = pStatement.executeUpdate();
         } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void removeStudent(int idStudent) throws SQLException {
+        int idAdmission = getIdAdmission(idStudent);
+        int idShip = getSSByStudent(idStudent);
+        int idParent = Integer.parseInt(Objects.requireNonNull(getStudent(idStudent)).get(6));
+        deletePayment(idAdmission);
+        if (idShip!=-1) {
+            deleteScholarship(idAdmission);
+        }
+        deleteAdmission(idAdmission);
+        deleteStudent(idStudent);
+        deleteTutor(idParent);
+        getConnection().commit();
+
+    }
+
+    private static void deleteTutor(int idParent) {
+        final String query = "delete from tutores where ID_TUTOR=?";
+        try (PreparedStatement pStatement = connection.prepareStatement(query)) {
+            pStatement.setInt(1, idParent );
+            int affectedRows = pStatement.executeUpdate();
+        }catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private static void deleteStudent(int idStudent) {
+        final String query = "delete from alumnos where ID_ALUMNO=?";
+        try (PreparedStatement pStatement = connection.prepareStatement(query)) {
+            pStatement.setInt(1, idStudent );
+            int affectedRows = pStatement.executeUpdate();
+        }catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void deleteAdmission(int idAdmission) {
+        final String query = "delete from inscripciones where ID_INSCRIPCION=?";
+        try (PreparedStatement pStatement = connection.prepareStatement(query)) {
+            pStatement.setInt(1, idAdmission );
+            int affectedRows = pStatement.executeUpdate();
+        }catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void deleteScholarship(int idAdmission) {
+        final String query = "delete from becas where ID_INSCRIPCION=?";
+        try (PreparedStatement pStatement = connection.prepareStatement(query)) {
+            pStatement.setInt(1, idAdmission );
+            int affectedRows = pStatement.executeUpdate();
+        }catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private static void deletePayment(int idAdmission) {
+        final String query = "delete from pagos_incripciones where ID_INSCRIPCION=?";
+        try (PreparedStatement pStatement = connection.prepareStatement(query)) {
+            pStatement.setInt(1, idAdmission );
+            int affectedRows = pStatement.executeUpdate();
+        }catch (SQLException e) {
             e.printStackTrace();
         }
     }

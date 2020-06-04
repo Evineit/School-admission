@@ -149,7 +149,7 @@ public class BecaPanel extends JPanel {
     }
 
     private void setContents() {
-        ArrayList<String> studentList = SqlService.getAlumno(idStudent);
+        ArrayList<String> studentList = SqlService.getStudent(idStudent);
         ArrayList<String> admissionList = SqlService.getAdmission(idAdmission);
         assert admissionList != null;
         int grade = Integer.parseInt(admissionList.get(2));

@@ -114,7 +114,7 @@ public class PaymentPanel extends JPanel {
     private void setContents() {
         ArrayList<String> admissionList = SqlService.getAdmission(admissionId);
         studentId = Integer.parseInt(admissionList.get(1));
-        ArrayList<String> studentList = SqlService.getAlumno(studentId);
+        ArrayList<String> studentList = SqlService.getStudent(studentId);
         int grade = Integer.parseInt(admissionList.get(2));
         name.setText(studentList.get(1));
         lName1.setText(studentList.get(7));

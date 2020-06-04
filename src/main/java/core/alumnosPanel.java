@@ -20,7 +20,7 @@ public class alumnosPanel extends JPanel {
     JTextField searchField = new JTextField();
     Connection con = SqlService.getConnection();
     JButton addButton = new JButton("Agregar");
-    private MainWindow parentPanel;
+    private MainWindow mainWindow;
     String[] sortingMode = {
             "Informacion General"
     };
@@ -28,7 +28,7 @@ public class alumnosPanel extends JPanel {
 
 
     public alumnosPanel(MainWindow mainWindow) {
-        parentPanel = mainWindow;
+        this.mainWindow = mainWindow;
         setLayout(new BorderLayout());
         JPanel temporal = new JPanel();
         temporal.add(addButton);
@@ -44,7 +44,7 @@ public class alumnosPanel extends JPanel {
         addButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                parentPanel.addAlumno();
+                alumnosPanel.this.mainWindow.addAlumno();
             }
         });
         editButton.addMouseListener(new MouseAdapter() {
@@ -53,8 +53,16 @@ public class alumnosPanel extends JPanel {
                 modifyStudent();
             }
         });
+        deleteButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                deleteStudent();
+            }
+        });
         
     }
+
+
 
     public void initTabla() {
         initTabla("");
@@ -114,7 +122,30 @@ public class alumnosPanel extends JPanel {
         if (row==-1 || comboBox.getSelectedIndex()!=0){
             JOptionPane.showMessageDialog(null, "No hay estudiante seleccionado");
         }else{
-            parentPanel.editAlumno(Integer.parseInt((String) table1.getValueAt(row,0)));
+            mainWindow.editAlumno(Integer.parseInt((String) table1.getValueAt(row,0)));
+        }
+    }
+    private void deleteStudent() {
+        int row;
+        row=table1.getSelectedRow();
+        if (row==-1 || comboBox.getSelectedIndex()!=0){
+            JOptionPane.showMessageDialog(null, "No hay estudiante seleccionado");
+        }else{
+            if (JOptionPane.YES_NO_OPTION==JOptionPane.showConfirmDialog(null,
+                    "Se borra el alumno y toda la información relacionada " +
+                    "¿Esta seguro de que desea borrar este alumno?","Advertencia",JOptionPane.YES_NO_OPTION,
+                    JOptionPane.WARNING_MESSAGE)) {
+                try {
+                    SqlService.startTransaction();
+                    SqlService.removeStudent(Integer.parseInt((String) table1.getValueAt(row,0)));
+                    // TODO: 04/06/2020 appears even if it fails 
+                    initTabla();
+                    JOptionPane.showMessageDialog(null,"Se ha borrado con exito");
+                } catch (SQLException throwables) {
+                    throwables.printStackTrace();
+                    mainWindow.rollback();
+                }
+            }
         }
     }
 

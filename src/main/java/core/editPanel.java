@@ -77,7 +77,7 @@ public class editPanel extends JPanel {
 
     public editPanel(MainWindow mainWindow, int studentID) {
         this.studentID = studentID;
-        ArrayList<String> studentList = SqlService.getAlumno(studentID);
+        ArrayList<String> studentList = SqlService.getStudent(studentID);
         assert studentList != null;
         final int idTutor = Integer.parseInt(studentList.get(6));
         ArrayList<String> tutorList = SqlService.getTutor(idTutor);
@@ -130,7 +130,7 @@ public class editPanel extends JPanel {
     }
     private boolean hasChanged(){
         //todo reduce this
-        ArrayList<String> studentList = SqlService.getAlumno(studentID);
+        ArrayList<String> studentList = SqlService.getStudent(studentID);
         assert studentList != null;
         ArrayList<String> tutorList = SqlService.getTutor(Integer.parseInt(studentList.get(6)));
         boolean flag = false;
