@@ -78,6 +78,7 @@ public class editPanel extends JPanel {
     public editPanel(MainWindow mainWindow, int studentID) {
         this.studentID = studentID;
         ArrayList<String> studentList = SqlService.getAlumno(studentID);
+        assert studentList != null;
         final int idTutor = Integer.parseInt(studentList.get(6));
         ArrayList<String> tutorList = SqlService.getTutor(idTutor);
         initElements();
@@ -109,9 +110,6 @@ public class editPanel extends JPanel {
                             }
                         }
                     }
-
-
-
                 }
                 final int grade = editPanel.this.grade.getSelectedIndex() + 1;
                 final int idSShip = SqlService.getSSByStudent(studentID);
@@ -133,6 +131,7 @@ public class editPanel extends JPanel {
     private boolean hasChanged(){
         //todo reduce this
         ArrayList<String> studentList = SqlService.getAlumno(studentID);
+        assert studentList != null;
         ArrayList<String> tutorList = SqlService.getTutor(Integer.parseInt(studentList.get(6)));
         boolean flag = false;
         if (!name.getText().equals(studentList.get(1))){
@@ -219,6 +218,7 @@ public class editPanel extends JPanel {
     }
     //TODO assert fields not empty
     // - Move to SQLService
+    //    - Remove Sql exeption
     public int addStudent() throws SQLException {
         int idStudent=0;
         try {

@@ -58,6 +58,7 @@ public class BecaPanel extends JPanel {
             public void mouseClicked(MouseEvent e) {
                 //Todo assert not empty
                 //todo register scholarship based on fields
+                // TODO: 04/06/2020 remove false scholarship when cost is not equal to total amount because of the format in the text fields
                 if (!cost.equals(totalAmount)) {
                     try {
                         int idSShip = SqlService.registerScholarship(idAdmission, idStudent, Integer.parseInt(percent.getText()), Double.parseDouble(flatAmount.getText()));
@@ -150,7 +151,9 @@ public class BecaPanel extends JPanel {
     private void setContents() {
         ArrayList<String> studentList = SqlService.getAlumno(idStudent);
         ArrayList<String> admissionList = SqlService.getAdmission(idAdmission);
+        assert admissionList != null;
         int grade = Integer.parseInt(admissionList.get(2));
+        assert studentList != null;
         name.setText(studentList.get(1));
         lName1.setText(studentList.get(7));
         lName2.setText(studentList.get(5));

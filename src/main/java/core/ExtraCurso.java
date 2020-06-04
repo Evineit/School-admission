@@ -7,6 +7,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 //todo primaria
 public class ExtraCurso extends JPanel {
@@ -65,24 +66,29 @@ public class ExtraCurso extends JPanel {
     }
 
     public ExtraCurso(MainWindow mainWindow, int idAdmission) {
-        ArrayList<String> list = SqlService.getAdmission(idAdmission);
-
-        init(SqlService.getGrade(Integer.parseInt(list.get(2))));
-
-        int studentID = Integer.parseInt(list.get(1));
+        ArrayList<String> admissionList = SqlService.getAdmission(idAdmission);
+        // TODO: 04/06/2020 assert not null
+        assert admissionList != null;
+        setStudentGrade(Integer.parseInt(admissionList.get(2)));
+        init(studentGrade);
+        int studentID = Integer.parseInt(admissionList.get(1));
+        setContents(admissionList);
         nextButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                if (hasChanged()){
-
-                }else {
-                    final int idSShip = SqlService.getSSByStudent(studentID);
-                    if (idSShip==-1){
-                        // TODO: 04/06/2020 finish this
-//                        mainWindow.changePayment();
-                    }else {
-                        mainWindow.changePayment(idAdmission,idSShip);
+                if (hasChanged(admissionList)){
+                    int ans = JOptionPane.showConfirmDialog(null,"Se han detectado cambios, desea conservarlos?",
+                            "Cambios detectados",JOptionPane.YES_NO_OPTION);
+                    if (ans==JOptionPane.YES_OPTION){
+                        SqlService.updateAdmission(idAdmission,studentGrade,list.getSelectedValue());
                     }
+                }
+                final int idSShip = SqlService.getSSByStudent(studentID);
+                if (idSShip==-1){
+                    mainWindow.showPayment(idAdmission);
+                }
+                else {
+                    mainWindow.changeBeca(idSShip);
                 }
             }
         });
@@ -98,9 +104,35 @@ public class ExtraCurso extends JPanel {
         });
     }
 
-    private boolean hasChanged() {
+    private void setContents(ArrayList<String> extraList) {
         // TODO: 03/06/2020 finish this add logic
-        return false;
+        if (studentGrade>=10){
+            ArrayList<String> checkList = new ArrayList<>(Arrays.asList(extraCurs));
+            int i = checkList.indexOf(extraList.get(3));
+            list.setSelectedIndex(i);
+        }else {
+            ArrayList<String> checkList = new ArrayList<>(Arrays.asList(talleres));
+            int i = checkList.indexOf(extraList.get(3));
+            list.setSelectedIndex(i);
+        }
+    }
+
+    private boolean hasChanged(ArrayList<String> extraList) {
+        boolean flag= false;
+        if (studentGrade>=10){
+            ArrayList<String> checkList = new ArrayList<>(Arrays.asList(extraCurs));
+            int i = checkList.indexOf(extraList.get(3));
+            if (i!=list.getSelectedIndex()){
+                flag =true;
+            }
+        }else {
+            ArrayList<String> checkList = new ArrayList<>(Arrays.asList(talleres));
+            int i = checkList.indexOf(extraList.get(3));
+            if (i!=list.getSelectedIndex()){
+                flag =true;
+            }
+        }
+        return flag;
     }
 
 

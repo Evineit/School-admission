@@ -123,11 +123,11 @@ public class SqlService {
         }
         return null;
     }
-    public static ArrayList<String> getAdmission(int id) {
+    public static ArrayList<String> getAdmission(int idAdmission) {
         ArrayList<String> list = new ArrayList<>();
         final String query = "SELECT * FROM inscripciones WHERE ID_INSCRIPCION = ?";
         try (PreparedStatement pStatement = connection.prepareStatement(query)) {
-            pStatement.setInt(1, id);
+            pStatement.setInt(1, idAdmission);
             ResultSet resultSet = pStatement.executeQuery();
             while (resultSet.next()) {
                 list.add(resultSet.getString(1));
@@ -156,7 +156,7 @@ public class SqlService {
         ArrayList<String> list = new ArrayList<>();
         final String query = "SELECT * FROM becas WHERE ID_ALUMNO = ?";
         list = getStrings(list, idStudent, query);
-        if (list==null){
+        if (list == null || list.isEmpty()){
             return -1;
         }else {
             return Integer.parseInt(list.get(0));
@@ -270,5 +270,23 @@ public class SqlService {
             e.printStackTrace();
         }
 
+    }
+
+    public static void updateAdmission(int idAdmission,int grade,String newValue) {
+        String query;
+        if (grade >= 10) {
+            query = "update inscripciones set EXTRACLASE=?" +
+                    " WHERE ID_INSCRIPCION = ?";
+        }else {
+            query = "update inscripciones set TALLER=?" +
+                    " WHERE ID_INSCRIPCION = ?";
+        }
+        try (PreparedStatement pStatement = connection.prepareStatement(query)) {
+            pStatement.setString(1, newValue);
+            pStatement.setInt(2, idAdmission);
+            int i = pStatement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }
