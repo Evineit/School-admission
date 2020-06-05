@@ -7,6 +7,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
+import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
@@ -31,6 +32,9 @@ public class BecaPanel extends JPanel {
     JCheckBox bestowCBox;
     JButton nextButton = new JButton("Siguiente");
     JButton cancelButton = new JButton("Cancelar");
+
+    GridBagLayout gridBagLayout = new GridBagLayout();
+    GridBagConstraints constraints = new GridBagConstraints();
     String[] levels = {
             "Primaria",
             "Secundaria",
@@ -53,6 +57,7 @@ public class BecaPanel extends JPanel {
         initElements();
         setContents();
         disableComponents();
+
         nextButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -115,7 +120,6 @@ public class BecaPanel extends JPanel {
             @Override
             public void mouseClicked(MouseEvent e) {
                 //Todo assert not empty
-                //todo register scholarship based on fields
                 mainWindow.showPayment(idAdmission,idBeca);
             }
         });
@@ -156,6 +160,22 @@ public class BecaPanel extends JPanel {
         totalAmount.setEnabled(false);
         percent.setEnabled(false);
         flatAmount.setEnabled(false);
+//        percent.setInputVerifier(new InputVerifier() {
+//            @Override
+//            public boolean verify(JComponent c) {
+//                    boolean verified = false;
+//                    JTextField textField = (JTextField) c;
+//                    try {
+//                        Double.parseDouble(textField.getText());
+//                        verified = true;
+//                    } catch (NumberFormatException e) {
+//                        UIManager.getLookAndFeel().provideErrorFeedback(c);
+//                        //Toolkit.getDefaultToolkit().beep();
+//                    }
+//                    return verified;
+//
+//            }
+//        });
     }
 
     private void setContents() {
@@ -204,23 +224,40 @@ public class BecaPanel extends JPanel {
         totalAmount = new JTextField();
         bestowCBox = new JCheckBox("Otorgar beca de inscripción");
 
-        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+//        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        setLayout(gridBagLayout);
+        addToPanel(new JLabel("Nombre:"),1,1,0);
+        addToPanel(new JLabel("Apellido Paterno:"),2,1,0);
+        addToPanel(new JLabel("Apellido Materno:"),3,1,0);
+        addToPanel(new JLabel("Grado:"),4,1,0);
+        addToPanel(new JLabel("Nivel:"),5,1,0);
+        addToPanel(new JLabel("Costo:"),6,1,0);
+//        addToPanel(new JLabel(":"),1,1,0);
+        addToPanel(new JLabel("Beca en porcentaje:"),8,1,0);
+        addToPanel(new JLabel("Beca en cantidad :"),9,1,0);
+        addToPanel(new JLabel("Descuento:"),10,1,0);
+        addToPanel(new JLabel("Cantidad Total:"),11,1,0);
 
-        add(name);
-        add(lName1);
-        add(lName2);
-        add(gradeField);
-        add(level);
-        add(cost);
-        add(bestowCBox);
-        add(percent);
-        add(flatAmount);
-        add(discount);
-        add(totalAmount);
-        add(nextButton);
-        add(cancelButton);
-
-
+        addToPanel(name,1,1,0);
+        addToPanel(lName1,2,1,0);
+        addToPanel(lName2,3,1,0);
+        addToPanel(gradeField,4,1,0);
+        addToPanel(level,5,1,0);
+        addToPanel(cost,6,1,0);
+        addToPanel(bestowCBox,7,1,0);
+        addToPanel(percent,8,1,0);
+        addToPanel(flatAmount,9,1,0);
+        addToPanel(discount,10,1,0);
+        addToPanel(totalAmount,11,1,0);
+        addToPanel(cancelButton,12,1,0);
+        addToPanel(nextButton,12,1,1);
+        nextButton.setBackground(Color.white);
+        cancelButton.setBackground(Color.white);
+        setOpaque(true);
+        setBackground(Color.white);
+        bestowCBox.setBackground(Color.white);
+        // TODO: 05/06/2020 check this
+//        discount.setDisabledTextColor(Color.decode("#999999"));
     }
 
     public void setIdAdmission(int idAdmission) {
@@ -281,5 +318,14 @@ public class BecaPanel extends JPanel {
         });
         Document d = text.getDocument();
         if (d != null) d.addDocumentListener(dl);
+    }
+    void addToPanel(JComponent component, int gridy, int width, int weightx) {
+        constraints.insets = new Insets(5, 5, 5, 5);
+        constraints.weightx = weightx;
+        constraints.weighty = 1;
+        constraints.fill = GridBagConstraints.HORIZONTAL;
+        constraints.gridwidth = width;
+        constraints.gridy = gridy;
+        add(component, constraints);
     }
 }

@@ -1,6 +1,7 @@
 package core;
 
 import javax.swing.*;
+import javax.swing.border.Border;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
@@ -18,9 +19,13 @@ public class alumnosPanel extends JPanel {
     private final JButton editButton = new JButton("Editar");
     private final JButton deleteButton = new JButton("Borrar");
     private final JButton buscarButton = new JButton("Buscar");
-    private final JTextField searchField = new JTextField(10);
+    private final JTextField searchField = new JTextField(11);
     DefaultTableModel miModelo;
-    private JTable table1 = new JTable();
+    private JTable table1 = new JTable(){
+        @Override public boolean isCellEditable(int row, int column) {
+            return false;
+        }
+    };
     Connection con = SqlService.getConnection();
     JButton addButton = new JButton("Agregar");
     private MainWindow mainWindow;
@@ -37,6 +42,7 @@ public class alumnosPanel extends JPanel {
 
 
     public alumnosPanel(MainWindow mainWindow) {
+
         this.mainWindow = mainWindow;
         setLayout(new BorderLayout());
         JPanel temporal = new JPanel();
@@ -49,6 +55,26 @@ public class alumnosPanel extends JPanel {
         add(temporal, BorderLayout.NORTH);
         add(new JScrollPane(table1), BorderLayout.CENTER);
         initTabla();
+        addButton.setBackground(Color.white);
+        editButton.setBackground(Color.white);
+        buscarButton.setBackground(Color.white);
+        deleteButton.setBackground(Color.white);
+//        searchField.setPreferredSize(new Dimension(searchField.getWidth(),deleteButton.getHeight()));
+        comboBox.setBackground(Color.white);
+        comboBox.setRenderer(new DefaultListCellRenderer(){
+            @Override
+            public void paint(Graphics g) {
+                super.paint(g);
+                setBackground(Color.WHITE);
+                setForeground(Color.BLACK);
+            }
+        });
+        searchField.requestFocusInWindow();
+        table1.setDragEnabled(false);
+        table1.setShowVerticalLines(false);
+        table1.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        table1.setRowHeight(30);
+
         addButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -402,5 +428,6 @@ public class alumnosPanel extends JPanel {
             }
         }
     }
+
 
 }

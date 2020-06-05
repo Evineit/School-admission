@@ -1,6 +1,7 @@
 package core;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.sql.*;
@@ -23,6 +24,10 @@ public class editPanel extends JPanel {
     JTextField tutorPhone;
     JButton nextButton = new JButton("Siguiente");
     JButton cancelButton = new JButton("Cancelar");
+
+    GridBagLayout gridBagLayout = new GridBagLayout();
+    GridBagConstraints constraints = new GridBagConstraints();
+
     String[] grades = {
             "1-Primaria",
             "2-Primaria",
@@ -66,6 +71,7 @@ public class editPanel extends JPanel {
                         "Cancelar inscripción",JOptionPane.YES_NO_OPTION);
                 if (i == JOptionPane.YES_OPTION){
                     mainWindow.rollback();
+                    mainWindow.changeAlumnos();
                 }
             }
         });
@@ -174,6 +180,8 @@ public class editPanel extends JPanel {
     }
 
     private void initElements() {
+        setOpaque(true);
+        setBackground(Color.WHITE);
         name = new JTextField();
         lNameM = new JTextField();
         lNameP = new JTextField();
@@ -185,22 +193,55 @@ public class editPanel extends JPanel {
         //TODO Validate Phone
         tutorPhone = new JTextField();
         tutorRfc = new JTextField();
+        JLabel nameLabel = new JLabel("Nombre:");
+        JLabel ape1Label = new JLabel("Apellido Paterno:");
+        JLabel ape2Label = new JLabel("Apellido Materno:");
+        JLabel ageLabel = new JLabel("Edad:");
+        JLabel gradeLabel = new JLabel("Grado:");
+        JLabel addressLabel = new JLabel("Dirección");
+        JLabel tutor1Label= new JLabel("Nombre:");
+        JLabel tutor2Label = new JLabel("Apellido:");
+        JLabel tutor3Label = new JLabel("RFC:");
+        JLabel tutor4Label = new JLabel("Teléfono:");
 
-        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        add(studentLabel);
-        add(name);
-        add(lNameP);
-        add(lNameM);
-        add(age);
-        add(address);
-        add(grade);
-        add(tutor);
-        add(tutorName);
-        add(tutorLName);
-        add(tutorRfc);
-        add(tutorPhone);
-        add(nextButton);
-        add(cancelButton);
+        setLayout(gridBagLayout);
+//        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        addToPanel(studentLabel,0,GridBagConstraints.REMAINDER,0);
+        addToPanel(nameLabel,1,1,0);
+        addToPanel(name,1,1,1);
+        addToPanel(ape1Label,2,1,0);
+        addToPanel(lNameP,2,1,0);
+        addToPanel(ape2Label,3,1,0);
+        addToPanel(lNameM,3,1,0);
+        addToPanel(ageLabel,4,1,0);
+        addToPanel(age,4,1,0);
+        addToPanel(addressLabel,5,1,0);
+        addToPanel(address,5,1,0);
+        addToPanel(gradeLabel,6,1,0);
+        addToPanel(grade,6,1,0);
+        addToPanel(tutor,7,GridBagConstraints.REMAINDER,0);
+        addToPanel(tutor1Label,8,1,0);
+        addToPanel(tutorName,8,1,0);
+        addToPanel(tutor2Label,9,1,0);
+        addToPanel(tutorLName,9,1,0);
+        addToPanel(tutor3Label,10,1,0);
+        addToPanel(tutorRfc,10,1,0);
+        addToPanel(tutor4Label,11,1,0);
+        addToPanel(tutorPhone,11,1,0);
+        addToPanel(cancelButton,12,1,0);
+        addToPanel(nextButton,12,1,0);
+
+        grade.setBackground(Color.white);
+        grade.setRenderer(new DefaultListCellRenderer(){
+            @Override
+            public void paint(Graphics g) {
+                super.paint(g);
+                setBackground(Color.WHITE);
+                setForeground(Color.BLACK);
+            }
+        });
+        nextButton.setBackground(Color.white);
+        cancelButton.setBackground(Color.white);
     }
 
     private void addTutor() throws SQLException {
@@ -260,5 +301,14 @@ public class editPanel extends JPanel {
         year*=1_000_000;
         year+=month;
         return year+nextAI;
+    }
+    void addToPanel(JComponent component, int gridy, int width, int weightx) {
+        constraints.insets = new Insets(5, 5, 5, 5);
+        constraints.weightx = weightx;
+        constraints.weighty = 1;
+        constraints.fill = GridBagConstraints.HORIZONTAL;
+        constraints.gridwidth = width;
+        constraints.gridy = gridy;
+        add(component, constraints);
     }
 }

@@ -1,6 +1,7 @@
 package core;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.sql.Connection;
@@ -20,6 +21,8 @@ public class ExtraCurso extends JPanel {
     private int studentGrade;
     JList<String> list;
     private int admissionId;
+    GridBagLayout gridBagLayout = new GridBagLayout();
+    GridBagConstraints constraints = new GridBagConstraints();
 
 
     public ExtraCurso(MainWindow mainWindow, int id, int grade) {
@@ -46,19 +49,22 @@ public class ExtraCurso extends JPanel {
     }
 
     private void init(int grade) {
-        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        setLayout(gridBagLayout);
 
         if (grade>=10){
-            add(new JLabel("Selección de extracurricular"));
+            addToPanel(new JLabel("Selección de extracurricular"),0,GridBagConstraints.REMAINDER,0,0);
             list = new JList<>(extraCurs);
         }else {
-            add(new JLabel("Selección de talleres"));
+            addToPanel(new JLabel("Selección de talleres"),0,GridBagConstraints.REMAINDER,0,0);
             list = new JList<>(talleres);
         }
-        add(new JScrollPane(list));
+        addToPanel(new JScrollPane(list),1,GridBagConstraints.REMAINDER,1,1);
 
-        add(nextButton);
-        add(cancelButton);
+        addToPanel(cancelButton,2,1,0,0);
+        addToPanel(nextButton,2,1,0,0);
+
+        nextButton.setBackground(Color.white);
+        cancelButton.setBackground(Color.white);
     }
 
     public ExtraCurso() {
@@ -163,5 +169,14 @@ public class ExtraCurso extends JPanel {
 
     public void setStudentGrade(int studentGrade) {
         this.studentGrade = studentGrade;
+    }
+    void addToPanel(JComponent component, int gridy, int width, int weightx,int weighty) {
+        constraints.insets = new Insets(5, 5, 5, 5);
+        constraints.weightx = weightx;
+        constraints.weighty = weighty;
+        constraints.fill = GridBagConstraints.BOTH;
+        constraints.gridwidth = width;
+        constraints.gridy = gridy;
+        add(component, constraints);
     }
 }

@@ -31,7 +31,11 @@ public class MainWindow extends JFrame {
         becaPanel = new BecaPanel();
         payPanel = new PaymentPanel();
         editAlumno = new editPanel();
-
+//        try {
+//            UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
+//        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {
+//            e.printStackTrace();
+//        }
         iniciarUI();
     }
     private void iniciarUI(){
@@ -90,6 +94,7 @@ public class MainWindow extends JFrame {
         setTitle("Admisión escolar");
         setContentPane(mainPanel);
         setVisible(true);
+
     }
     public void iniciar(){
         pack();
@@ -153,7 +158,9 @@ public class MainWindow extends JFrame {
             @Override
             public void nextLogic(MainWindow mainWindow) {
                     // TODO: 03/06/2020 Doesnt update table
-                    mainWindow.changeAlumnos();
+                this.print();
+                mainWindow.changeAlumnos();
+
             }
         };
         contentPanel.add(payPanel,"Card5");
