@@ -62,7 +62,6 @@ public class BecaPanel extends JPanel {
             @Override
             public void mouseClicked(MouseEvent e) {
                 //Todo assert not empty
-                //todo register scholarship based on fields
                 // TODO: 04/06/2020 remove false scholarship when cost is not equal to total amount because of the format in the text fields
                 if (!cost.equals(totalAmount)&& bestowCBox.isSelected()) {
                     try {
@@ -70,7 +69,6 @@ public class BecaPanel extends JPanel {
                         mainWindow.changePayment(idAdmission, idSShip);
                     } catch (SQLException throwables) {
                         throwables.printStackTrace();
-                        //Todo error rollback
                         mainWindow.rollback();
                     }
                 } else {

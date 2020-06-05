@@ -50,6 +50,11 @@ public class editPanel extends JPanel {
             @Override
             public void mouseClicked(MouseEvent e) {
                 try {
+                    if (!validateTextFields()) {
+                        JOptionPane.showMessageDialog(null,"No se puede continuar, existen campos vacíos",
+                                "Información",JOptionPane.INFORMATION_MESSAGE);
+                        return;
+                    }
                     int studentID = addStudent();
                     final int grade = editPanel.this.grade.getSelectedIndex() + 1;
                     if (grade<=6){
@@ -77,6 +82,23 @@ public class editPanel extends JPanel {
         });
     }
 
+    private boolean validateTextFields() {
+        for (Component c :
+                getComponents()) {
+            if (c instanceof JTextField){
+                if (isEmpty(c)){
+                    return false;
+                }
+            }
+        }
+        return true;
+
+    }
+    private boolean isEmpty(Component c){
+        JTextField text = (JTextField) c;
+        return text.getText().strip().isEmpty();
+    }
+
     public editPanel() {
 
     }
@@ -94,8 +116,11 @@ public class editPanel extends JPanel {
             public void mouseClicked(MouseEvent e) {
 
                 if (hasChanged()){
-                    // TODO: 03/06/2020 update this if something change
-                    // TODO: 04/06/2020 assert not empty fields
+                    if (!validateTextFields()) {
+                        JOptionPane.showMessageDialog(null,"No se puede continuar, existen campos vacíos",
+                                "Información",JOptionPane.INFORMATION_MESSAGE);
+                        return;
+                    }
                     int ans = JOptionPane.showConfirmDialog(null,"Se han detectado cambios, desea conservarlos?",
                             "Cambios detectados",JOptionPane.YES_NO_OPTION);
                     if (ans==JOptionPane.YES_OPTION){
@@ -257,8 +282,7 @@ public class editPanel extends JPanel {
 
 
     }
-    //TODO assert fields not empty
-    // - Move to SQLService
+    //TODO  Move to SQLService
     //    - Remove Sql exeption
     public int addStudent() throws SQLException {
         int idStudent=0;

@@ -10,7 +10,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-//todo primaria
 public class ExtraCurso extends JPanel {
     String[] extraCurs = {"Ajedrez","Futbol"};
     String[] talleres = {"Electricidad","Carpintería"};
@@ -111,7 +110,6 @@ public class ExtraCurso extends JPanel {
     }
 
     private void setContents(ArrayList<String> extraList) {
-        // TODO: 03/06/2020 finish this add logic
         if (studentGrade>=10){
             ArrayList<String> checkList = new ArrayList<>(Arrays.asList(extraCurs));
             int i = checkList.indexOf(extraList.get(3));

@@ -104,7 +104,6 @@ public class PaymentPanel extends JPanel implements Printable {
 
 
     public void nextLogic(MainWindow mainWindow) {
-        //Todo confirm
         try {
             int ans = JOptionPane.showConfirmDialog(null,"¿Esta seguro de que desea guardar la " +
                             "inscripción del alumno con los datos ingresados?",
@@ -206,7 +205,6 @@ public class PaymentPanel extends JPanel implements Printable {
 
 
         setLayout(gridBagLayout);
-        // TODO: 05/06/2020 add fullname fields
         addToPanel(new JLabel("Pago de inscripción"),0,1,0);
         addToPanel(new JLabel("Nombre:"),1,1,0);
         addToPanel(new JLabel("Matricula:"),2,1,0);
@@ -234,6 +232,8 @@ public class PaymentPanel extends JPanel implements Printable {
 
         nextButton.setBackground(Color.white);
         cancelButton.setBackground(Color.white);
+        setOpaque(true);
+        setBackground(Color.white);
 
     }
 

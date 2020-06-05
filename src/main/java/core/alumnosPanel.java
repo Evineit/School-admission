@@ -1,7 +1,6 @@
 package core;
 
 import javax.swing.*;
-import javax.swing.border.Border;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
@@ -20,6 +19,9 @@ public class alumnosPanel extends JPanel {
     private final JButton deleteButton = new JButton("Borrar");
     private final JButton buscarButton = new JButton("Buscar");
     private final JTextField searchField = new JTextField(11);
+
+    GridBagLayout gridBagLayout = new GridBagLayout();
+    GridBagConstraints constraints = new GridBagConstraints();
     DefaultTableModel miModelo;
     private JTable table1 = new JTable(){
         @Override public boolean isCellEditable(int row, int column) {
@@ -38,7 +40,7 @@ public class alumnosPanel extends JPanel {
             "Becas",
             "Pagos"
     };
-    private final JComboBox<String> comboBox = new JComboBox<>(sortingMode);
+    private final JComboBox<String> modeComboBox = new JComboBox<>(sortingMode);
 
 
     public alumnosPanel(MainWindow mainWindow) {
@@ -46,12 +48,13 @@ public class alumnosPanel extends JPanel {
         this.mainWindow = mainWindow;
         setLayout(new BorderLayout());
         JPanel temporal = new JPanel();
-        temporal.add(addButton);
-        temporal.add(editButton);
-        temporal.add(deleteButton);
-        temporal.add(searchField);
-        temporal.add(buscarButton);
-        temporal.add(comboBox);
+        temporal.setLayout(gridBagLayout);
+        addToPanel(temporal,addButton,1,1,0);
+        addToPanel(temporal,editButton,1,1,0);
+        addToPanel(temporal,deleteButton,1,1,0);
+        addToPanel(temporal,searchField,1,1,1);
+        addToPanel(temporal,buscarButton,1,1,0);
+        addToPanel(temporal, modeComboBox,1,1,0,1);
         add(temporal, BorderLayout.NORTH);
         add(new JScrollPane(table1), BorderLayout.CENTER);
         initTabla();
@@ -59,9 +62,11 @@ public class alumnosPanel extends JPanel {
         editButton.setBackground(Color.white);
         buscarButton.setBackground(Color.white);
         deleteButton.setBackground(Color.white);
+        table1.getTableHeader().setFont(new Font("Dialog",Font.BOLD,12));
+        table1.getTableHeader().setBackground(Color.white);
 //        searchField.setPreferredSize(new Dimension(searchField.getWidth(),deleteButton.getHeight()));
-        comboBox.setBackground(Color.white);
-        comboBox.setRenderer(new DefaultListCellRenderer(){
+        modeComboBox.setBackground(Color.white);
+        modeComboBox.setRenderer(new DefaultListCellRenderer(){
             @Override
             public void paint(Graphics g) {
                 super.paint(g);
@@ -93,7 +98,7 @@ public class alumnosPanel extends JPanel {
                 deleteStudent();
             }
         });
-        comboBox.addItemListener(e -> changeViews());
+        modeComboBox.addItemListener(e -> changeViews());
         buscarButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -112,7 +117,7 @@ public class alumnosPanel extends JPanel {
     }
 
     private void changeViews() {
-        final int index = comboBox.getSelectedIndex();
+        final int index = modeComboBox.getSelectedIndex();
         if (index ==0){
             initTabla();
         }else if (index ==1){
@@ -399,7 +404,7 @@ public class alumnosPanel extends JPanel {
     private void modifyStudent() {
         int row;
         row=table1.getSelectedRow();
-        if (row==-1 || comboBox.getSelectedIndex()!=0){
+        if (row==-1 || modeComboBox.getSelectedIndex()!=0){
             JOptionPane.showMessageDialog(null, "No hay estudiante seleccionado");
         }else{
             mainWindow.editAlumno(Integer.parseInt((String) table1.getValueAt(row,0)));
@@ -408,7 +413,7 @@ public class alumnosPanel extends JPanel {
     private void deleteStudent() {
         int row;
         row=table1.getSelectedRow();
-        if (row==-1 || comboBox.getSelectedIndex()!=0){
+        if (row==-1 || modeComboBox.getSelectedIndex()!=0){
             JOptionPane.showMessageDialog(null, "No hay estudiante seleccionado");
         }else{
             if (JOptionPane.YES_NO_OPTION==JOptionPane.showConfirmDialog(null,
@@ -427,6 +432,18 @@ public class alumnosPanel extends JPanel {
                 }
             }
         }
+    }
+    void addToPanel(JPanel panel,JComponent component, int gridy, int width, int weightx,int r) {
+        constraints.insets = new Insets(5, 0, 5, r);
+        constraints.weightx = weightx;
+        constraints.weighty = 1;
+        constraints.fill = GridBagConstraints.BOTH;
+        constraints.gridwidth = width;
+        constraints.gridy = gridy;
+        panel.add(component, constraints);
+    }
+    void addToPanel(JPanel panel,JComponent component, int gridy, int width, int weightx) {
+        addToPanel(panel,component,gridy,width,weightx,5);
     }
 
 

@@ -52,9 +52,9 @@ public class LoginWindow extends JFrame {
         usersCombo.setRenderer(new DefaultListCellRenderer(){
             @Override
             public void paint(Graphics g) {
+                super.paint(g);
                 setBackground(Color.WHITE);
                 setForeground(Color.BLACK);
-                super.paint(g);
             }
         });
         passLabel = new JLabel("Contraseña");

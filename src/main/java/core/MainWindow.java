@@ -24,7 +24,7 @@ public class MainWindow extends JFrame {
 
 
 
-    //todo Valida todo GRACIAS
+    //TODO: Validar todo
     public MainWindow() {
         alumnos = new alumnosPanel(this);
         extraPanel = new ExtraCurso();
@@ -157,7 +157,6 @@ public class MainWindow extends JFrame {
         payPanel = new PaymentPanel(this,idAdmission){
             @Override
             public void nextLogic(MainWindow mainWindow) {
-                    // TODO: 03/06/2020 Doesnt update table
                 this.print();
                 mainWindow.changeAlumnos();
 
