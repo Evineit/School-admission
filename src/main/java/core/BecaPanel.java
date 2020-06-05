@@ -28,7 +28,7 @@ public class BecaPanel extends JPanel {
     JTextField flatAmount;
     JTextField discount;
     JTextField totalAmount;
-    JCheckBox bestow;
+    JCheckBox bestowCBox;
     JButton nextButton = new JButton("Siguiente");
     JButton cancelButton = new JButton("Cancelar");
     String[] levels = {
@@ -59,7 +59,7 @@ public class BecaPanel extends JPanel {
                 //Todo assert not empty
                 //todo register scholarship based on fields
                 // TODO: 04/06/2020 remove false scholarship when cost is not equal to total amount because of the format in the text fields
-                if (!cost.equals(totalAmount)) {
+                if (!cost.equals(totalAmount)&& bestowCBox.isSelected()) {
                     try {
                         int idSShip = SqlService.registerScholarship(idAdmission, idStudent, Integer.parseInt(percent.getText()), Double.parseDouble(flatAmount.getText()));
                         mainWindow.changePayment(idAdmission, idSShip);
@@ -83,6 +83,15 @@ public class BecaPanel extends JPanel {
                 }
             }
         });
+        bestowCBox.addActionListener(e -> {
+            if (bestowCBox.isSelected()){
+                percent.setEnabled(true);
+                flatAmount.setEnabled(true);
+            }else if (!bestowCBox.isSelected()){
+                percent.setEnabled(false);
+                flatAmount.setEnabled(false);
+            }
+        });
         addChangeListener(percent, e -> calculateDiscount());
         addChangeListener(flatAmount, e -> calculateDiscount());
 
@@ -99,9 +108,7 @@ public class BecaPanel extends JPanel {
         disableComponents();
         percent.setText(list.get(3));
         flatAmount.setText(list.get(4));
-        percent.setEnabled(false);
-        flatAmount.setEnabled(false);
-        bestow.setEnabled(false);
+        bestowCBox.setEnabled(false);
         calculateDiscount();
 
         nextButton.addMouseListener(new MouseAdapter() {
@@ -127,7 +134,8 @@ public class BecaPanel extends JPanel {
     private void calculateDiscount() {
         // TODO: 03/06/2020 assert flatdiscount and percent are non negative, percent is between 0,100
         // TODO: 03/06/2020 double and format on discount and total amount
-        // TODO: 03/06/2020 beca checkbox
+        if (flatAmount.getText().strip().isEmpty()) return;
+        if (percent.getText().strip().isEmpty()) return;
         double cost = Double.parseDouble(this.cost.getText());
         double flatDiscount = Double.parseDouble(flatAmount.getText());
         double percent = Double.parseDouble(this.percent.getText());
@@ -146,6 +154,8 @@ public class BecaPanel extends JPanel {
         gradeField.setEnabled(false);
         discount.setEnabled(false);
         totalAmount.setEnabled(false);
+        percent.setEnabled(false);
+        flatAmount.setEnabled(false);
     }
 
     private void setContents() {
@@ -192,7 +202,7 @@ public class BecaPanel extends JPanel {
         flatAmount = new JTextField();
         discount = new JTextField();
         totalAmount = new JTextField();
-        bestow = new JCheckBox("Otorgar beca de inscripción");
+        bestowCBox = new JCheckBox("Otorgar beca de inscripción");
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
@@ -202,7 +212,7 @@ public class BecaPanel extends JPanel {
         add(gradeField);
         add(level);
         add(cost);
-        add(bestow);
+        add(bestowCBox);
         add(percent);
         add(flatAmount);
         add(discount);

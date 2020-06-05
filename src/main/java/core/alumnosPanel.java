@@ -67,9 +67,7 @@ public class alumnosPanel extends JPanel {
                 deleteStudent();
             }
         });
-        comboBox.addItemListener(e -> {
-            changeViews();
-        });
+        comboBox.addItemListener(e -> changeViews());
         buscarButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
