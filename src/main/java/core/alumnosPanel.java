@@ -31,7 +31,7 @@ public class alumnosPanel extends JPanel {
     Connection con = SqlService.getConnection();
     JButton addButton = new JButton("Agregar");
     private MainWindow mainWindow;
-    String[] sortingMode = {
+    final String[] sortingMode = {
             "Información General",
             "Información Tutores",
             "Estudiantes Primaria",
@@ -137,10 +137,6 @@ public class alumnosPanel extends JPanel {
 
 
     public void initTabla() {
-        initTabla("");
-    }
-
-    private void initTabla(String id) {
         // TODO: 04/06/2020 agregar grado
         miModelo = new DefaultTableModel();
         miModelo.addColumn("Id Alumno");
@@ -155,14 +151,8 @@ public class alumnosPanel extends JPanel {
 
         String[] datos = new String[8];
 
-//        String sql ="Select * from empleado";
-        String sql;
-        if (id.equals("")) {
-            sql = "Select * from alumnos";
-            sortTable();
-        } else {
-            sql = "Select * from alumnos where ID_ALUMNO = '" + id + "'";
-        }
+        String sql = "Select * from alumnos";
+        sortTable();
 
         try {
             Statement sentencia = con.createStatement();
@@ -404,7 +394,7 @@ public class alumnosPanel extends JPanel {
     private void modifyStudent() {
         int row;
         row=table1.getSelectedRow();
-        if (row==-1 || modeComboBox.getSelectedIndex()!=0){
+        if (row==-1){
             JOptionPane.showMessageDialog(null, "No hay estudiante seleccionado");
         }else{
             mainWindow.editAlumno(Integer.parseInt((String) table1.getValueAt(row,0)));
