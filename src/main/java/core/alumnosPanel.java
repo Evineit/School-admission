@@ -5,6 +5,8 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.sql.Connection;
@@ -15,14 +17,21 @@ import java.sql.Statement;
 public class alumnosPanel extends JPanel {
     private final JButton editButton = new JButton("Editar");
     private final JButton deleteButton = new JButton("Borrar");
+    private final JButton buscarButton = new JButton("Buscar");
+    private final JTextField searchField = new JTextField(10);
     DefaultTableModel miModelo;
     private JTable table1 = new JTable();
-    JTextField searchField = new JTextField();
     Connection con = SqlService.getConnection();
     JButton addButton = new JButton("Agregar");
     private MainWindow mainWindow;
     String[] sortingMode = {
-            "Informacion General"
+            "Información General",
+            "Información Tutores",
+            "Estudiantes Primaria",
+            "Estudiantes Secundaria",
+            "Estudiantes Preparatoria",
+            "Becas",
+            "Pagos"
     };
     private final JComboBox<String> comboBox = new JComboBox<>(sortingMode);
 
@@ -34,13 +43,12 @@ public class alumnosPanel extends JPanel {
         temporal.add(addButton);
         temporal.add(editButton);
         temporal.add(deleteButton);
-        temporal.add(new JTextField(10));
-        temporal.add(new JButton("Buscar"));
+        temporal.add(searchField);
+        temporal.add(buscarButton);
         temporal.add(comboBox);
         add(temporal, BorderLayout.NORTH);
         add(new JScrollPane(table1), BorderLayout.CENTER);
         initTabla();
-
         addButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -59,9 +67,44 @@ public class alumnosPanel extends JPanel {
                 deleteStudent();
             }
         });
+        comboBox.addItemListener(e -> {
+            changeViews();
+        });
+        buscarButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                sortTable();
+            }
+        });
+        searchField.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode()== KeyEvent.VK_ENTER){
+                    sortTable();
+                }
+            }
+        });
         
     }
 
+    private void changeViews() {
+        final int index = comboBox.getSelectedIndex();
+        if (index ==0){
+            initTabla();
+        }else if (index ==1){
+            showParentsInfo();
+        }else if (index ==2){
+            showElementary();
+        }else if (index ==3){
+            showMiddleSchool();
+        }else if (index==4){
+            showHighSchool();
+        }else if (index==5){
+            showScholarship();
+        }else if (index==6){
+            showPayments();
+        }
+    }
 
 
     public void initTabla() {
@@ -69,6 +112,7 @@ public class alumnosPanel extends JPanel {
     }
 
     private void initTabla(String id) {
+        // TODO: 04/06/2020 agregar grado
         miModelo = new DefaultTableModel();
         miModelo.addColumn("Id Alumno");
         miModelo.addColumn("Nombre");
@@ -110,10 +154,222 @@ public class alumnosPanel extends JPanel {
             e.printStackTrace();
         }
     }
+    void showParentsInfo(){
+        miModelo = new DefaultTableModel();
+
+        miModelo.addColumn("Id Alumno");
+        miModelo.addColumn("Id Tutor");
+        miModelo.addColumn("Nombre");
+        miModelo.addColumn("Apellido");
+        miModelo.addColumn("RFC");
+        miModelo.addColumn("Teléfono");
+        table1.setModel(miModelo);
+        sortTable();
+        String[] datos = new String[miModelo.getColumnCount()];
+
+        // TODO: 04/06/2020 move to service
+//        String sql ="Select * from empleado";
+        String sql;
+        sql = "Select ID_ALUMNO,tutores.ID_TUTOR,TUTO_NOMBRE,TUTO_APELLIDO,TUTO_RFC,TUTO_TELEFONO" +
+                " from tutores,alumnos where alumnos.ID_TUTOR = tutores.ID_TUTOR";
+        try {
+            Statement sentencia = con.createStatement();
+            ResultSet rs = sentencia.executeQuery(sql);
+            while (rs.next()) {
+                datos[0] = rs.getString(1);
+                datos[1] = rs.getString(2);
+                datos[2] = rs.getString(3);
+                datos[3] = rs.getString(4);
+                datos[4] = rs.getString(5);
+                datos[5] = rs.getString(6);
+                miModelo.addRow(datos);
+            }
+            table1.setModel(miModelo);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    void showMiddleSchool(){
+        miModelo = new DefaultTableModel();
+
+        miModelo.addColumn("Id Alumno");
+        miModelo.addColumn("Matricula");
+        miModelo.addColumn("Grado");
+        miModelo.addColumn("Taller");
+        miModelo.addColumn("Fecha de Inscripción");
+        table1.setModel(miModelo);
+        sortTable();
+        String[] datos = new String[miModelo.getColumnCount()];
+
+        // TODO: 04/06/2020 move to service
+//        String sql ="Select * from empleado";
+        String sql;
+        sql = "Select alumnos.ID_ALUMNO,MATRICULA,GRADO,TALLER,INSC_FECHA" +
+                " from inscripciones,alumnos where alumnos.ID_ALUMNO = inscripciones.ID_ALUMNO and " +
+                "GRADO>=6 and GRADO<=9";
+        try {
+            Statement sentencia = con.createStatement();
+            ResultSet rs = sentencia.executeQuery(sql);
+            while (rs.next()) {
+                datos[0] = rs.getString(1);
+                datos[1] = rs.getString(2);
+                datos[2] = rs.getString(3);
+                datos[3] = rs.getString(4);
+                datos[4] = rs.getString(5);
+                miModelo.addRow(datos);
+            }
+            table1.setModel(miModelo);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    void addColumns(DefaultTableModel model,String... args){
+        for (String string:
+             args) {
+            model.addColumn(string);
+        }
+    }
+    void showPayments(){
+        miModelo = new DefaultTableModel();
+        addColumns(miModelo,"ID Alumno","Grado","Cantidad Pago","Fecha","Otros Detalles");
+        table1.setModel(miModelo);
+        sortTable();
+        String[] datos = new String[miModelo.getColumnCount()];
+
+        // TODO: 04/06/2020 move to service
+        String sql = "Select pagos_incripciones.ID_ALUMNO,GRADO,CANTIDAD_PAGO,INSC_FECHA,OTROS_DETALLES" +
+                " from pagos_incripciones,inscripciones where pagos_incripciones.ID_ALUMNO=inscripciones.ID_ALUMNO";
+        try {
+            Statement sentencia = con.createStatement();
+            ResultSet rs = sentencia.executeQuery(sql);
+            while (rs.next()) {
+                for (int i = 0; i < datos.length; i++) {
+                    datos[i] = rs.getString(i+1);
+                }
+                miModelo.addRow(datos);
+            }
+            table1.setModel(miModelo);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    private double calculateDiscount(double percent, double flat, int grade){// TODO: 03/06/2020 assert flatDiscount and percent are non negative, percent is between 0,100
+        double cost;
+        int [] prices = PaymentPanel.prices;
+        if (grade<=6){
+            if (grade<=3){
+                cost=prices[0];
+            }else {
+                cost=prices[1];
+            }
+        }else if (grade<=9){
+            cost=prices[2];
+
+        }else {
+            cost=prices[3];
+        }
+        double d = (cost - flat);
+        d -= d * (percent / 100);
+
+        return cost - d;
+//        this.totalAmount.setText(String.valueOf(d));
+    }
+    void showScholarship(){
+        miModelo = new DefaultTableModel();
+        addColumns(miModelo,"ID Alumno","Grado","Desc en Porcentaje","Descuento fijo","Descuento total");
+        table1.setModel(miModelo);
+        sortTable();
+        String[] datos = new String[miModelo.getColumnCount()];
+
+        // TODO: 04/06/2020 move to service
+        // TODO: 04/06/2020 fix the 0 amount scholarships
+        String sql = "Select becas.ID_ALUMNO,GRADO,PORCENTAJE,CANTIDAD" +
+                " from becas,inscripciones where becas.ID_ALUMNO=inscripciones.ID_ALUMNO and (PORCENTAJE>0 or CANTIDAD>0)";
+        try {
+            Statement sentencia = con.createStatement();
+            ResultSet rs = sentencia.executeQuery(sql);
+            while (rs.next()) {
+                for (int i = 0; i < datos.length-1; i++) {
+                    datos[i] = rs.getString(i+1);
+                }
+                datos[datos.length-1] = String.valueOf(calculateDiscount(Double.parseDouble(datos[2]),Double.parseDouble(datos[3]),Integer.parseInt(datos[1])));
+                miModelo.addRow(datos);
+            }
+            table1.setModel(miModelo);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    void showElementary(){
+        miModelo = new DefaultTableModel();
+
+        miModelo.addColumn("Id Alumno");
+        miModelo.addColumn("Matricula");
+        miModelo.addColumn("Grado");
+        miModelo.addColumn("Fecha de Inscripción");
+        table1.setModel(miModelo);
+        sortTable();
+        String[] datos = new String[miModelo.getColumnCount()];
+
+        // TODO: 04/06/2020 move to service
+//        String sql ="Select * from empleado";
+        String sql;
+        sql = "Select alumnos.ID_ALUMNO,MATRICULA,GRADO,INSC_FECHA" +
+                " from inscripciones,alumnos where alumnos.ID_ALUMNO = inscripciones.ID_ALUMNO and " +
+                "GRADO<=6";
+        try {
+            Statement sentencia = con.createStatement();
+            ResultSet rs = sentencia.executeQuery(sql);
+            while (rs.next()) {
+                datos[0] = rs.getString(1);
+                datos[1] = rs.getString(2);
+                datos[2] = rs.getString(3);
+                datos[3] = rs.getString(4);
+                miModelo.addRow(datos);
+            }
+            table1.setModel(miModelo);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    void showHighSchool(){
+        miModelo = new DefaultTableModel();
+
+        miModelo.addColumn("Id Alumno");
+        miModelo.addColumn("Matricula");
+        miModelo.addColumn("Grado");
+        miModelo.addColumn("Extracurricular");
+        miModelo.addColumn("Fecha de Inscripción");
+        table1.setModel(miModelo);
+        sortTable();
+        String[] datos = new String[miModelo.getColumnCount()];
+
+        // TODO: 04/06/2020 move to service
+//        String sql ="Select * from empleado";
+        String sql;
+        sql = "Select alumnos.ID_ALUMNO,MATRICULA,GRADO,EXTRACLASE,INSC_FECHA" +
+                " from inscripciones,alumnos where alumnos.ID_ALUMNO = inscripciones.ID_ALUMNO and " +
+                "GRADO>=10";
+        try {
+            Statement sentencia = con.createStatement();
+            ResultSet rs = sentencia.executeQuery(sql);
+            while (rs.next()) {
+                datos[0] = rs.getString(1);
+                datos[1] = rs.getString(2);
+                datos[2] = rs.getString(3);
+                datos[3] = rs.getString(4);
+                datos[4] = rs.getString(5);
+                miModelo.addRow(datos);
+            }
+            table1.setModel(miModelo);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
     private void sortTable() {
         TableRowSorter<TableModel> sorter = new TableRowSorter<>(table1.getModel());
-        sorter.setRowFilter(RowFilter.regexFilter("(?i)" + searchField.getText()));
+        sorter.setRowFilter(RowFilter.regexFilter("(?i)" + searchField.getText(),0));
         table1.setRowSorter(sorter);
     }
     private void modifyStudent() {

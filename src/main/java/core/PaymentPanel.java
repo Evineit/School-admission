@@ -29,7 +29,7 @@ public class PaymentPanel extends JPanel {
             "Secundaria",
             "Preparatoria"
     };
-    int[] prices = {
+    public static int[] prices = {
             1500,
             2000,
             2500,

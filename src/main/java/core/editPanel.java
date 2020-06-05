@@ -211,7 +211,7 @@ public class editPanel extends JPanel {
         preparedStatement.setString(1, tutorName.getText());
         preparedStatement.setString(2, tutorLName.getText());
         preparedStatement.setString(3, tutorRfc.getText());
-        preparedStatement.setString(4, tutorRfc.getText());
+        preparedStatement.setString(4, tutorPhone.getText());
         preparedStatement.executeUpdate();
 
 
