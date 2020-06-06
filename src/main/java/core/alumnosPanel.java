@@ -272,7 +272,7 @@ public class alumnosPanel extends JPanel {
             e.printStackTrace();
         }
     }
-    private double calculateDiscount(double percent, double flat, int grade){// TODO: 03/06/2020 assert flatDiscount and percent are non negative, percent is between 0,100
+    private double calculateDiscount(double percent, double flat, int grade){
         double cost;
         int [] prices = PaymentPanel.prices;
         if (grade<=6){

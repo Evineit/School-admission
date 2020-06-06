@@ -5,14 +5,14 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.text.Document;
-import javax.swing.text.JTextComponent;
+import javax.swing.text.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.sql.SQLException;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -26,9 +26,11 @@ public class BecaPanel extends JPanel {
     JTextField level;
     JTextField cost;
     JTextField percent;
-    JTextField flatAmount;
-    JTextField discount;
-    JTextField totalAmount;
+    JFormattedTextField flatAmount;
+    NumberFormat percentFormat;
+    NumberFormat flatFormat;
+    JFormattedTextField discount;
+    JFormattedTextField totalAmount;
     JCheckBox bestowCBox;
     JButton nextButton = new JButton("Siguiente");
     JButton cancelButton = new JButton("Cancelar");
@@ -61,9 +63,12 @@ public class BecaPanel extends JPanel {
         nextButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                //Todo assert not empty
-                // TODO: 04/06/2020 remove false scholarship when cost is not equal to total amount because of the format in the text fields
-                if (!cost.equals(totalAmount)&& bestowCBox.isSelected()) {
+                if (!validateTextFields()) {
+                    JOptionPane.showMessageDialog(null,"No se puede continuar, revise los campos",
+                            "Información",JOptionPane.INFORMATION_MESSAGE);
+                    return;
+                }
+                if (!cost.equals(totalAmount)&& bestowCBox.isSelected() && isDiscountValid()) {
                     try {
                         int idSShip = SqlService.registerScholarship(idAdmission, idStudent, Integer.parseInt(percent.getText()), Double.parseDouble(flatAmount.getText()));
                         mainWindow.changePayment(idAdmission, idSShip);
@@ -117,7 +122,7 @@ public class BecaPanel extends JPanel {
         nextButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                //Todo assert not empty
+                //Todo assert not empty?
                 mainWindow.showPayment(idAdmission,idBeca);
             }
         });
@@ -132,19 +137,53 @@ public class BecaPanel extends JPanel {
             }
         });
     }
+    private boolean validateTextFields() {
+        if (percent != null){
+            if (isEmpty(percent)){
+                return false;
+            }
+        }
+        if (flatAmount != null){
+            if (isEmpty(percent)){
+                return false;
+            }
+        }
+        try{
+            Double.parseDouble(flatAmount.getText());
+            flatAmount.setBackground(Color.white);
+        }catch (NumberFormatException e){
+            flatAmount.setBackground(new Color(250,230,230));
+            return false;
+        }
+        return true;
 
+    }
+    private boolean isDiscountValid() {
+        assert flatAmount != null;
+        if (Double.parseDouble(flatAmount.getText())==0 && Double.parseDouble(percent.getText())==0){
+            return false;
+        }
+        return true;
+    }
+    private boolean isEmpty(Component c){
+        JTextField text = (JTextField) c;
+        return text.getText().strip().isEmpty();
+    }
     private void calculateDiscount() {
-        // TODO: 03/06/2020 assert flatdiscount and percent are non negative, percent is between 0,100
-        // TODO: 03/06/2020 double and format on discount and total amount
         if (flatAmount.getText().strip().isEmpty()) return;
         if (percent.getText().strip().isEmpty()) return;
-        double cost = Double.parseDouble(this.cost.getText());
-        double flatDiscount = Double.parseDouble(flatAmount.getText());
-        double percent = Double.parseDouble(this.percent.getText());
-        double d = (cost - flatDiscount);
-        d -= d * (percent / 100);
-        discount.setText(String.valueOf(cost - d));
-        totalAmount.setText(String.valueOf(d));
+        try {
+            double cost = Double.parseDouble(this.cost.getText());
+            double flatDiscount = Double.parseDouble(flatAmount.getText());
+            double percent = Double.parseDouble(this.percent.getText());
+            double d = (cost - flatDiscount);
+            d -= d * (percent / 100);
+            discount.setValue(cost - d);
+            totalAmount.setValue(d);
+        }catch (NumberFormatException e){
+//            Toolkit.getDefaultToolkit().beep();
+
+        }
     }
 
     private void disableComponents() {
@@ -201,8 +240,49 @@ public class BecaPanel extends JPanel {
             level.setText(levels[2]);
             cost.setText(String.valueOf(prices[3]));
         }
+        ((AbstractDocument) percent.getDocument()).setDocumentFilter(new IntegerDocumentFilter());
+        percent.setInputVerifier(new InputVerifier() {
+            @Override
+            public boolean verify(JComponent c) {
+                boolean verified = false;
+                JTextField textField = (JTextField) c;
+                try {
+                    if (Integer.parseInt(textField.getText())>100){
+                        textField.setText("100");
+                        UIManager.getLookAndFeel().provideErrorFeedback(c);
+                    }
+                    verified = true;
+                    c.setBackground(Color.white);
+                } catch (NumberFormatException e) {
+                    c.setBackground(new Color(255,230,230));
+                    UIManager.getLookAndFeel().provideErrorFeedback(c);
+                    //Toolkit.getDefaultToolkit().beep();
+                }
+                return verified;
+            }
+        });
         percent.setText("0");
-        flatAmount.setText("0");
+        flatAmount.setText("0.00");
+        flatAmount.setInputVerifier(new InputVerifier() {
+            @Override
+            public boolean verify(JComponent c) {
+                boolean verified = false;
+                JFormattedTextField textField = (JFormattedTextField) c;
+                try {
+                    if (Double.parseDouble(textField.getText())>Integer.parseInt(cost.getText())){
+                        textField.setValue(Double.parseDouble(cost.getText()));
+                        UIManager.getLookAndFeel().provideErrorFeedback(c);
+                    }
+                    verified = true;
+                    c.setBackground(Color.white);
+                } catch (NumberFormatException e) {
+                    c.setBackground(new Color(255,230,230));
+                    UIManager.getLookAndFeel().provideErrorFeedback(c);
+                    //Toolkit.getDefaultToolkit().beep();
+                }
+                return verified;
+            }
+        });
         discount.setText("0");
         totalAmount.setText(cost.getText());
 
@@ -216,10 +296,11 @@ public class BecaPanel extends JPanel {
         gradeField = new JTextField();
         level = new JTextField();
         cost = new JTextField();
+        setFormat();
         percent = new JTextField();
-        flatAmount = new JTextField();
-        discount = new JTextField();
-        totalAmount = new JTextField();
+        flatAmount = new JFormattedTextField(flatFormat);
+        discount = new JFormattedTextField(flatFormat);
+        totalAmount = new JFormattedTextField(flatFormat);
         bestowCBox = new JCheckBox("Otorgar beca de inscripción");
 
 //        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -325,5 +406,16 @@ public class BecaPanel extends JPanel {
         constraints.gridwidth = width;
         constraints.gridy = gridy;
         add(component, constraints);
+    }
+    private void setFormat() {
+        percentFormat = NumberFormat.getNumberInstance();
+        flatFormat = NumberFormat.getNumberInstance();
+        percentFormat.setGroupingUsed(false);
+        percentFormat.setMaximumFractionDigits(0);
+        percentFormat.setMaximumIntegerDigits(3);
+        flatFormat.setGroupingUsed(false);
+        flatFormat.setMinimumFractionDigits(2);
+        flatFormat.setMaximumFractionDigits(2);
+        flatFormat.setMaximumIntegerDigits(4);
     }
 }
