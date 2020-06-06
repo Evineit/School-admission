@@ -41,6 +41,12 @@ public class SqlService {
 
         return connection;
     }
+    public static void login(String p) throws SQLException {
+        if (connection == null) {
+            System.out.println("\n\n***** MySQL JDBC Connection Testing *****");
+            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/priv_school", "schoolAdmin", p);
+        }
+    }
 
     public static void startTransaction() {
         if (connection != null) {

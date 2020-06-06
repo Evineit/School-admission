@@ -157,9 +157,13 @@ public class MainWindow extends JFrame {
         payPanel = new PaymentPanel(this,idAdmission){
             @Override
             public void nextLogic(MainWindow mainWindow) {
-                this.print();
+//                this.print();
                 mainWindow.changeAlumnos();
+            }
 
+            @Override
+            public void cancelLogic(MainWindow mainWindow) {
+                mainWindow.changeAlumnos();
             }
         };
         contentPanel.add(payPanel,"Card5");
@@ -170,6 +174,10 @@ public class MainWindow extends JFrame {
         payPanel = new PaymentPanel(this,idAdmission,idBeca){
             @Override
             public void nextLogic(MainWindow mainWindow) {
+                mainWindow.changeAlumnos();
+            }
+            @Override
+            public void cancelLogic(MainWindow mainWindow) {
                 mainWindow.changeAlumnos();
             }
         };

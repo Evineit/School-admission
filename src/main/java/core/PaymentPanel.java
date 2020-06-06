@@ -64,16 +64,21 @@ public class PaymentPanel extends JPanel implements Printable {
         cancelButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                int i = JOptionPane.showConfirmDialog(null,"¿Esta seguro de que desea cancelar el proceso de inscripción?",
-                        "Cancelar inscripción",JOptionPane.YES_NO_OPTION);
-                if (i == JOptionPane.YES_OPTION){
-                    mainWindow.rollback();
-                }
+                cancelLogic(mainWindow);
             }
         });
 
 
     }
+
+    public void cancelLogic(MainWindow mainWindow) {
+        int i = JOptionPane.showConfirmDialog(null,"¿Esta seguro de que desea cancelar el proceso de inscripción?",
+                "Cancelar inscripción",JOptionPane.YES_NO_OPTION);
+        if (i == JOptionPane.YES_OPTION){
+            mainWindow.rollback();
+        }
+    }
+
     public void print(){
         nextButton.setVisible(false);
         cancelButton.setVisible(false);

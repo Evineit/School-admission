@@ -97,13 +97,14 @@ public class ExtraCurso extends JPanel {
                 }
             }
         });
+        // TODO: 06/06/2020 message when cancel and changes
         cancelButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                int i = JOptionPane.showConfirmDialog(null,"¿Esta seguro de que desea cancelar el proceso de inscripción?",
-                        "Cancelar inscripción",JOptionPane.YES_NO_OPTION);
+                int i = JOptionPane.showConfirmDialog(null,"¿Esta seguro de que desea salir?",
+                        "Salir",JOptionPane.YES_NO_OPTION);
                 if (i == JOptionPane.YES_OPTION){
-                    mainWindow.rollback();
+                    mainWindow.changeAlumnos();
                 }
             }
         });

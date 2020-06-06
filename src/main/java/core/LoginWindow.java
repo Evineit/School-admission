@@ -1,10 +1,13 @@
 package core;
 
+import org.mariadb.jdbc.internal.logging.Slf4JLogger;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.sql.SQLException;
 
 public class LoginWindow extends JFrame {
     private JPanel mainPanel;
@@ -74,10 +77,7 @@ public class LoginWindow extends JFrame {
         login.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                try{
-                    validarLogin();
-                }catch (Exception error){
-                }
+                validarLogin();
             }
         });
         login.addMouseListener(new MouseAdapter() {
@@ -120,12 +120,13 @@ public class LoginWindow extends JFrame {
 
     }
     public void validarLogin(){
-        String selected = (String) usersCombo.getSelectedItem();
+//        String selected = (String) usersCombo.getSelectedItem();
         char[] pass = passField.getPassword();
-        if ("1234".equals(new String(pass))){
+        try {
+            SqlService.login(new String(pass));
             SwingUtilities.invokeLater(new MainWindow()::iniciar);
             this.dispose();
-        }else{
+        } catch (SQLException throwables) {
             JOptionPane.showMessageDialog(null,"Contraseña incorrecta",
                     "Error", JOptionPane.ERROR_MESSAGE);
             passField.setText("");

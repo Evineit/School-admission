@@ -111,6 +111,7 @@ public class editPanel extends JPanel {
         ArrayList<String> tutorList = SqlService.getTutor(idTutor);
         initElements();
         setContents(studentList,tutorList);
+        // TODO: 06/06/2020 disable grade and level 
         nextButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -155,6 +156,16 @@ public class editPanel extends JPanel {
 
                 }else {
                     mainWindow.changeExtra(idAdmission);
+                }
+            }
+        });
+        cancelButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int i = JOptionPane.showConfirmDialog(null,"¿Esta seguro de que desea salir?",
+                        "Cancelar inscripción",JOptionPane.YES_NO_OPTION);
+                if (i == JOptionPane.YES_OPTION){
+                    mainWindow.changeAlumnos();
                 }
             }
         });
