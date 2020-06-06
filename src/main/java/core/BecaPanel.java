@@ -224,7 +224,6 @@ public class BecaPanel extends JPanel {
         name.setText(studentList.get(1));
         lName1.setText(studentList.get(7));
         lName2.setText(studentList.get(5));
-        gradeField.setText(String.valueOf(grade));
         if (grade <= 6) {
             level.setText(levels[0]);
             if (grade <= 3) {
@@ -233,13 +232,16 @@ public class BecaPanel extends JPanel {
                 cost.setText(String.valueOf(prices[1]));
             }
         } else if (grade <= 9) {
+            grade-=6;
             level.setText(levels[1]);
             cost.setText(String.valueOf(prices[2]));
 
         } else {
+            grade-=9;
             level.setText(levels[2]);
             cost.setText(String.valueOf(prices[3]));
         }
+        gradeField.setText(String.valueOf(grade));
         ((AbstractDocument) percent.getDocument()).setDocumentFilter(new IntegerDocumentFilter());
         percent.setInputVerifier(new InputVerifier() {
             @Override

@@ -48,6 +48,8 @@ public class alumnosPanel extends JPanel {
         this.mainWindow = mainWindow;
         setLayout(new BorderLayout());
         JPanel temporal = new JPanel();
+        temporal.setOpaque(true);
+        temporal.setBackground(Color.white);
         temporal.setLayout(gridBagLayout);
         addToPanel(temporal,addButton,1,1,0);
         addToPanel(temporal,editButton,1,1,0);
@@ -113,7 +115,6 @@ public class alumnosPanel extends JPanel {
                 }
             }
         });
-        
     }
 
     private void changeViews() {

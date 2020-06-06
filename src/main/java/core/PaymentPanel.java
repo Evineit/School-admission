@@ -15,9 +15,6 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-import static java.awt.print.Printable.NO_SUCH_PAGE;
-import static java.awt.print.Printable.PAGE_EXISTS;
-
 public class PaymentPanel extends JPanel implements Printable {
     private int admissionId;
     private int studentId;
@@ -173,7 +170,6 @@ public class PaymentPanel extends JPanel implements Printable {
         registry.setText(studentList.get(7));
         tutorId.setText(studentList.get(6));
         //Todo grado por nivel
-        gradeField.setText(String.valueOf(grade));
         if (grade<=6){
             level.setText(levels[0]);
             if (grade<=3){
@@ -182,13 +178,16 @@ public class PaymentPanel extends JPanel implements Printable {
                 cost.setText(String.valueOf(prices[1]));
             }
         }else if (grade<=9){
+            grade-=6;
             level.setText(levels[1]);
             cost.setText(String.valueOf(prices[2]));
 
         }else {
+            grade-=9;
             level.setText(levels[2]);
             cost.setText(String.valueOf(prices[3]));
         }
+        gradeField.setText(String.valueOf(grade));
         //Todo get beca por id
         percent.setText("0");
         flatAmount.setText("0");
