@@ -18,6 +18,7 @@ public class alumnosPanel extends JPanel {
     private final JButton editButton = new JButton("Editar");
     private final JButton deleteButton = new JButton("Borrar");
     private final JButton buscarButton = new JButton("Buscar");
+    private final JButton printButton = new JButton("Imprimir");
     private final JTextField searchField = new JTextField(11);
 
     GridBagLayout gridBagLayout = new GridBagLayout();
@@ -53,6 +54,7 @@ public class alumnosPanel extends JPanel {
         temporal.setLayout(gridBagLayout);
         addToPanel(temporal,addButton,1,1,0);
         addToPanel(temporal,editButton,1,1,0);
+        addToPanel(temporal,printButton,1,1,0);
         addToPanel(temporal,deleteButton,1,1,0);
         addToPanel(temporal,searchField,1,1,1);
         addToPanel(temporal,buscarButton,1,1,0);
@@ -63,6 +65,7 @@ public class alumnosPanel extends JPanel {
         addButton.setBackground(Color.white);
         editButton.setBackground(Color.white);
         buscarButton.setBackground(Color.white);
+        printButton.setBackground(Color.white);
         deleteButton.setBackground(Color.white);
         table1.getTableHeader().setFont(new Font("Dialog",Font.BOLD,12));
         table1.getTableHeader().setBackground(Color.white);
@@ -105,6 +108,12 @@ public class alumnosPanel extends JPanel {
             @Override
             public void mouseClicked(MouseEvent e) {
                 sortTable();
+            }
+        });
+        printButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                printStudent();
             }
         });
         searchField.addKeyListener(new KeyAdapter() {
@@ -399,6 +408,16 @@ public class alumnosPanel extends JPanel {
             JOptionPane.showMessageDialog(null, "No hay estudiante seleccionado");
         }else{
             mainWindow.editAlumno(Integer.parseInt((String) table1.getValueAt(row,0)));
+        }
+    }
+    private void printStudent() {
+        int row;
+        row=table1.getSelectedRow();
+        if (row==-1){
+            JOptionPane.showMessageDialog(null, "No hay estudiante seleccionado");
+        }else{
+            final int idStudent = Integer.parseInt((String) table1.getValueAt(row, 0));
+            mainWindow.printPayment(SqlService.getIdAdmission(idStudent));
         }
     }
     private void deleteStudent() {

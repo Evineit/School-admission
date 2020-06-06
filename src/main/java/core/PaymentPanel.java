@@ -46,6 +46,7 @@ public class PaymentPanel extends JPanel implements Printable {
             2500,
             3000
     };
+    private JLabel fecha;
 
     public PaymentPanel(MainWindow mainWindow, int idAdmission) {
         setAdmissionId(idAdmission);
@@ -90,7 +91,7 @@ public class PaymentPanel extends JPanel implements Printable {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        if (JOptionPane.YES_OPTION==JOptionPane.showConfirmDialog(null,"Desea imprimir un comprobante","Imprimir",JOptionPane.YES_NO_OPTION)){
+        if (JOptionPane.YES_OPTION==JOptionPane.showConfirmDialog(null,"Desea imprimir un comprobante?","Imprimir comprobante de pago",JOptionPane.YES_NO_OPTION)){
             PrinterJob job = PrinterJob.getPrinterJob();
             job.setPrintable(this);
             boolean ok = job.printDialog();
@@ -166,23 +167,27 @@ public class PaymentPanel extends JPanel implements Printable {
         studentId = Integer.parseInt(admissionList.get(1));
         ArrayList<String> studentList = SqlService.getStudent(studentId);
         int grade = Integer.parseInt(admissionList.get(2));
+        // TODO: 06/06/2020 separate the text fields
         name.setText(studentList.get(1)+" "+studentList.get(2)+" "+ studentList.get(3));
         registry.setText(studentList.get(7));
         tutorId.setText(studentList.get(6));
         //Todo grado por nivel
         if (grade<=6){
             level.setText(levels[0]);
+            fecha.setText(admissionList.get(3));
             if (grade<=3){
                 cost.setText(String.valueOf(prices[0]));
             }else {
                 cost.setText(String.valueOf(prices[1]));
             }
         }else if (grade<=9){
+            fecha.setText(admissionList.get(4));
             grade-=6;
             level.setText(levels[1]);
             cost.setText(String.valueOf(prices[2]));
 
         }else {
+            fecha.setText(admissionList.get(4));
             grade-=9;
             level.setText(levels[2]);
             cost.setText(String.valueOf(prices[3]));
@@ -193,6 +198,10 @@ public class PaymentPanel extends JPanel implements Printable {
         flatAmount.setText("0");
         discount.setText("0");
         totalAmount.setText(cost.getText());
+        addToPanel(new JLabel("Fecha de pago:"),11,1,0);
+        addToPanel(fecha,11,GridBagConstraints.REMAINDER,1);
+        addToPanel(cancelButton,12,1,0);
+        addToPanel(nextButton,12,1,1);
 
 
     }
@@ -209,6 +218,7 @@ public class PaymentPanel extends JPanel implements Printable {
         details = new JTextArea();
         details.setLineWrap(true);
         totalAmount = new JTextField();
+        fecha = new JLabel("Fecha");
 
 
         setLayout(gridBagLayout);
@@ -234,8 +244,7 @@ public class PaymentPanel extends JPanel implements Printable {
         addToPanel(discount,8,1,0);
         addToPanel(details,9,1,0);
         addToPanel(totalAmount,10,1,0);
-        addToPanel(cancelButton,11,1,0);
-        addToPanel(nextButton,11,1,1);
+
 
         nextButton.setBackground(Color.white);
         cancelButton.setBackground(Color.white);

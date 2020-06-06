@@ -160,7 +160,6 @@ public class MainWindow extends JFrame {
 //                this.print();
                 mainWindow.changeAlumnos();
             }
-
             @Override
             public void cancelLogic(MainWindow mainWindow) {
                 mainWindow.changeAlumnos();
@@ -168,6 +167,15 @@ public class MainWindow extends JFrame {
         };
         contentPanel.add(payPanel,"Card5");
         cl.show(contentPanel, "Card5");
+    }
+    public void printPayment(int idAdmission) {
+        JDialog tempo = new JDialog();
+        final PaymentPanel comp = new PaymentPanel(this, idAdmission);
+        tempo.add(comp);
+        tempo.setSize(this.getWidth(),this.getHeight());
+        tempo.setVisible(true);
+        comp.print();
+        tempo.dispose();
     }
 
     public void showPayment(int idAdmission, int idBeca) {
