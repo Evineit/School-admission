@@ -115,7 +115,7 @@ public class PaymentPanel extends JPanel implements Printable {
                 SqlService.registerPayment(admissionId,studentId, Double.parseDouble(totalAmount.getText()),details.getText());
                 print();
                 mainWindow.changeAlumnos();
-                // TODO: 05/06/2020 table doesnt update
+                // TODO: 05/06/2020 table doesnt update all the times
             }
         } catch (SQLException throwables) {
             throwables.printStackTrace();
@@ -135,8 +135,6 @@ public class PaymentPanel extends JPanel implements Printable {
 
     private void calculateDiscount(int idSShip){
         ArrayList<String> scholarShip = SqlService.getScholarship(idSShip);
-        // TODO: 03/06/2020 assert flatDiscount and percent are non negative, percent is between 0,100
-        // TODO: 05/06/2020 if checkbox is not selected remove discount on total amount
         // TODO: 06/06/2020 fix showing non formatted text
         int cost = Integer.parseInt(this.cost.getText());
         double flatDiscount = Double.parseDouble(scholarShip.get(4));
@@ -171,7 +169,6 @@ public class PaymentPanel extends JPanel implements Printable {
         name.setText(studentList.get(1)+" "+studentList.get(2)+" "+ studentList.get(3));
         registry.setText(studentList.get(7));
         tutorId.setText(studentList.get(6));
-        //Todo grado por nivel
         if (grade<=6){
             level.setText(levels[0]);
             fecha.setText(admissionList.get(3));
@@ -193,7 +190,6 @@ public class PaymentPanel extends JPanel implements Printable {
             cost.setText(String.valueOf(prices[3]));
         }
         gradeField.setText(String.valueOf(grade));
-        //Todo get beca por id
         percent.setText("0");
         flatAmount.setText("0");
         discount.setText("0");

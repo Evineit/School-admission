@@ -95,9 +95,11 @@ public class BecaPanel extends JPanel {
             if (bestowCBox.isSelected()){
                 percent.setEnabled(true);
                 flatAmount.setEnabled(true);
+                calculateDiscount();
             }else if (!bestowCBox.isSelected()){
                 percent.setEnabled(false);
                 flatAmount.setEnabled(false);
+                totalAmount.setText(cost.getText());
             }
         });
         addChangeListener(percent, e -> calculateDiscount());
@@ -122,7 +124,6 @@ public class BecaPanel extends JPanel {
         nextButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                //Todo assert not empty?
                 mainWindow.showPayment(idAdmission,idBeca);
             }
         });
@@ -337,8 +338,7 @@ public class BecaPanel extends JPanel {
         setOpaque(true);
         setBackground(Color.white);
         bestowCBox.setBackground(Color.white);
-        // TODO: 05/06/2020 check this
-//        discount.setDisabledTextColor(Color.decode("#999999"));
+        // TODO: 06/06/2020 improve colors while disabled
     }
 
     public void setIdAdmission(int idAdmission) {

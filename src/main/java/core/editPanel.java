@@ -111,7 +111,7 @@ public class editPanel extends JPanel {
         ArrayList<String> tutorList = SqlService.getTutor(idTutor);
         initElements();
         setContents(studentList,tutorList);
-        // TODO: 06/06/2020 disable grade and level 
+        grade.setEnabled(false);
         nextButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -226,7 +226,6 @@ public class editPanel extends JPanel {
         grade = new JComboBox<>(grades);
         tutorName = new JTextField();
         tutorLName = new JTextField();
-        //TODO Validate Phone
         tutorPhone = new JTextField();
         tutorRfc = new JTextField();
         JLabel nameLabel = new JLabel("Nombre:");
@@ -281,7 +280,7 @@ public class editPanel extends JPanel {
     }
 
     private void addTutor() throws SQLException {
-        // TODO: 03/06/2020 check for existing parent / reuse parents
+        // TODO: 03/06/2020 check for existing parent / reuse parents?
         // TODO: 03/06/2020 move to sql service
         PreparedStatement preparedStatement = connection.prepareStatement("Insert into tutores (TUTO_NOMBRE, TUTO_APELLIDO, TUTO_RFC, TUTO_TELEFONO)" +
                 "values (?,?,?,?)");

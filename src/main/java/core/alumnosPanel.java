@@ -147,7 +147,6 @@ public class alumnosPanel extends JPanel {
 
 
     public void initTabla() {
-        // TODO: 04/06/2020 agregar grado
         miModelo = new DefaultTableModel();
         miModelo.addColumn("Id Alumno");
         miModelo.addColumn("Nombre");
@@ -311,7 +310,6 @@ public class alumnosPanel extends JPanel {
         String[] datos = new String[miModelo.getColumnCount()];
 
         // TODO: 04/06/2020 move to service
-        // TODO: 04/06/2020 fix the 0 amount scholarships
         String sql = "Select becas.ID_ALUMNO,GRADO,PORCENTAJE,CANTIDAD" +
                 " from becas,inscripciones where becas.ID_ALUMNO=inscripciones.ID_ALUMNO and (PORCENTAJE>0 or CANTIDAD>0)";
         try {
